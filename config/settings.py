@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "crispy_forms",
     'crispy_bootstrap5',
+    "adminsortable2",
     'statapp',
     "survey_builder",
 ]

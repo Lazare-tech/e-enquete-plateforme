@@ -3,11 +3,11 @@ from django.contrib import admin
 # Register your models here.
 from django.contrib import admin
 from .models import Survey, Question, Option, Submission, Answer
-
+from adminsortable2.admin import SortableAdminMixin, SortableTabularInline
 # 1. Permet d'ajouter des options directement sous la question
-class OptionInline(admin.TabularInline):
+class OptionInline(SortableTabularInline):
     model = Option
-    extra = 1 # Une ligne vide prête à être remplie
+    extra = 1
 
 # 2. Permet d'ajouter des questions directement sous le questionnaire
 class QuestionInline(admin.StackedInline):
@@ -28,11 +28,10 @@ class SurveyAdmin(admin.ModelAdmin):
     inlines = [QuestionInline] # On injecte les questions dans le formulaire Survey
 
 @admin.register(Question)
-class QuestionAdmin(admin.ModelAdmin):
-    list_display = ('label', 'survey', 'question_type', 'order')
-    list_filter = ('survey', 'question_type')
-    inlines = [OptionInline] # On injecte les options dans le formulaire Question
-
+class QuestionAdmin(SortableAdminMixin, admin.ModelAdmin):
+    list_display = ('order', 'label', 'survey', 'question_type')
+    list_filter = ('survey',)
+    inlines = [OptionInline]
 # Visualisation des réponses (Lecture seule pour la sécurité des données)
 class AnswerInline(admin.TabularInline):
     model = Answer

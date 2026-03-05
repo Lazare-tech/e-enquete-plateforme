@@ -20,4 +20,5 @@ from django.urls import path,include
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("statapp.urls",namespace="statapp")),
+    path('survey/', include("survey_builder.urls", namespace="survey")),
 ]

@@ -1,0 +1,83 @@
+
+
+/* NAVBAR PARTY */
+/* Style spécifique à l'identité visuelle Shine */
+:root {
+    --shine-blue: #122046;
+    --shine-gold: #D4AF37;
+}
+
+.user-avatar-circle {
+    width: 40px;
+    height: 40px;
+    background-color: var(--shine-blue);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+    border: 2px solid var(--shine-gold);
+    transition: all 0.3s ease;
+}
+
+.user-avatar-circle:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+.dropdown-toggle::after {
+    display: none; 
+}
+
+.dropdown-item {
+    transition: 0.2s;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: var(--shine-blue);
+    padding-left: 1.5rem;
+}
+
+/* Ajustement pour les boutons personnalisés */
+.btn-primary {
+    background-color: var(--shine-blue);
+    border-color: var(--shine-blue);
+}
+
+.btn-primary:hover {
+    background-color: #1a2f66;
+    border-color: #1a2f66;
+}
+/* END NAVBAR PARTY  */
+/* FOOTER PARTY */
+/* Optimisations Footer */
+footer {
+    font-size: 0.95rem;
+}
+
+.social-icons i {
+    font-size: 1.25rem;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.social-icons a:hover i {
+    transform: translateY(-3px);
+    color: #D4AF37; /* Rappel du doré Shine */
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.7) !important;
+    transition: 0.2s;
+}
+
+.footer-links a:hover {
+    color: #fff !important;
+    padding-left: 5px;
+}
+
+.border-primary {
+    border-color: #D4AF37 !important; /* Utilisation du doré pour les accents */
+}

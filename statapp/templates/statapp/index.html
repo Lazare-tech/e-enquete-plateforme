@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Catalogue des Statistiques{% endblock title %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-5 justify-content-center">
+        <div class="col-md-7 text-center">
+            <h2 class="fw-bold mb-3">Catalogue des Données Statistiques</h2>
+            <p class="text-muted mb-4">Accédez aux enquêtes et rapports détaillés de notre agence.</p>
+            <div class="input-group shadow-sm">
+                <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                <input type="text" 
+                       name="q" 
+                       class="form-control border-start-0 ps-0" 
+                       placeholder="Rechercher par mot-clé (ex: Coton, Recensement...)"
+                       hx-get="{% url 'statapp:search' %}" 
+                       hx-target="#file-results" 
+                       hx-trigger="keyup changed delay:500ms">
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4" id="file-results">
+        {% include 'statapp/partials/file_list.html' %}
+</div>
+
+<style>
+/* Vos styles restent identiques */
+.hover-lift { transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); }
+.hover-lift:hover { transform: translateY(-8px); box-shadow: 0 1rem 3rem rgba(0,0,0,0.1) !important; }
+.text-truncate-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; min-height: 4.5em; }
+.badge { font-size: 0.75rem; padding: 0.5em 1em; font-weight: 600; }
+.btn-primary { background-color: #0056A6; border: none; transition: 0.2s; }
+.btn-primary:hover { background-color: #003d7a; }
+</style>
+{% endblock content %}

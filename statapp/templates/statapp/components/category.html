@@ -1,0 +1,18 @@
+<div class="category-menu mb-4">
+    <h6 class="text-uppercase text-muted small fw-bold mb-3">Catégories</h6>
+    <div class="d-flex flex-nowrap overflow-auto pb-2 gap-2" style="-webkit-overflow-scrolling: touch;">
+        {% for cat in categories %}
+        <a href="?category={{ cat.slug }}" class="btn btn-white shadow-sm border rounded-pill px-3 py-2 d-flex align-items-center flex-shrink-0 text-decoration-none text-dark hover-blue">
+            <i class="fas {{ cat.icon }} me-2 text-primary"></i>
+            <span class="small fw-bold">{{ cat.title }}</span>
+        </a>
+        {% endfor %}
+        <a href="?" class="btn btn-light border rounded-pill px-3 py-2 flex-shrink-0 text-decoration-none text-dark small">Toutes</a>
+    </div>
+</div>
+
+<style>
+    /* Pour cacher la barre de défilement tout en gardant le scroll */
+    .category-menu div::-webkit-scrollbar { display: none; }
+    .hover-blue:hover { border-color: #0d6efd !important; color: #0d6efd !important; }
+</style>

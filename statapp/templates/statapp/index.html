@@ -1,7 +1,17 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Catalogue des Statistiques{% endblock title %}
 
+{% block title %}Catalogue des données statistiques | Portail collaboratif{% endblock title %}
+
+{% block meta_description %}
+Explorez notre base de données mutualisée.Accédez aux rapports d'enquêtes terrain,analyses statistiques et jeux de données brutes partagés par notre équipe pour vos travaux de recherche.
+{% endblock meta_description %}
+{% block extra_meta %}
+<meta property="og:title" content="Catalogue de Données Statistiques - Accès Libre">
+<meta property="og:description" content="Recherchez et téléchargez les dernières enquêtes et rapports de notre équipe.">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta property="og:image" content="{% static 'images/home-catalog-banner.jpg' %}">
+{% endblock extra_meta %}
 {% block content %}
 <div class="container py-5">
     <div class="row mb-5 justify-content-center">
@@ -15,13 +25,13 @@
                        class="form-control border-start-0 ps-0" 
                        placeholder="Rechercher par mot-clé (ex: Coton, Recensement...)"
                        hx-get="{% url 'statapp:search' %}" 
-                       hx-target="#file-results" 
+                       hx-target="#fileGrid" 
                        hx-trigger="keyup changed delay:500ms">
             </div>
         </div>
     </div>
 
-    <div class="row g-4" id="file-results">
+    <div class="row g-4" id="fileGrid">
         {% include 'statapp/partials/file_list.html' %}
 </div>
 

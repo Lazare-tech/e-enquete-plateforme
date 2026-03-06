@@ -64,3 +64,18 @@ class UserFileAccess(models.Model):
 
     class Meta:
         unique_together = ('user', 'stat_file') # Empêche les doublons
+######
+
+class FAQ(models.Model):
+    question = models.CharField(max_length=255, verbose_name="Question")
+    answer = models.TextField(verbose_name="Réponse")
+    is_active = models.BooleanField(default=True, verbose_name="Visible sur le site")
+    order = models.PositiveIntegerField(default=0, verbose_name="Ordre d'affichage")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "FAQ"
+        ordering = ['order', '-created_at'] # Tri par ordre, puis par date
+
+    def __str__(self):
+        return self.question

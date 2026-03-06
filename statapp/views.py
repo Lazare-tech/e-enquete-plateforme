@@ -8,7 +8,7 @@ from django.views.generic import CreateView
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from statapp.forms import CleanRegisterForm
-from .models import StatFile,UserFileAccess
+from .models import StatFile,UserFileAccess,FAQ
 from django.db.models import Q
 # Create your views here.
 def homepage(request):
@@ -19,25 +19,44 @@ def homepage(request):
         'files': files
     }
     return render(request, 'statapp/index.html', context)
+###
+
+def faq_view(request):
+    faqs = FAQ.objects.filter(is_active=True)
+    context={
+        'faqs': faqs
+    }
+    return render(request, 'statapp/partials/faq.html', context)
+###
+def error_404_view(request, exception):
+    return render(request, '404.html', status=404)
+###
 def search_files(request):
-    # Récupérer la recherche (q) depuis l'URL
+    # Récupérer les deux paramètres : texte et catégorie
     query = request.GET.get('q', '')
-    
-    # Filtrer les fichiers actifs
+    category_slug = request.GET.get('category', '')
+    print("cccccccc",category_slug)
+    # On commence par tous les fichiers actifs
     files = StatFile.objects.filter(is_active=True)
     
+    # Filtre 1 : Par texte (Titre ou Description)
     if query:
-        # Recherche dans le titre OU la description (insensible à la casse)
-        files = files.filter(
-            Q(title__icontains=query) | 
-            Q(description__icontains=query)
-        )
+        files = files.filter(Q(title__icontains=query) | Q(description__icontains=query))
+    if category_slug:
+        files = files.filter(category__slug=category_slug)
+    # Filtre 2 : Par catégorie (via le slug de la catégorie)
+    if category_slug:
+        files = files.filter(category__slug=category_slug)
 
-    # LOGIQUE HTMX : Si c'est une requête HTMX, on ne renvoie que les cartes
+    # LOGIQUE HTMX : Indispensable pour la fluidité Shine Agency
     if request.headers.get('HX-Request'):
-        return render(request, 'statapp/partials/file_list.html', {'files': files})
+        context={
+            'files':files,
+            'current_query': query,        
+        'current_category': category_slug
+        }
+        return render(request, 'statapp/partials/file_list.html', context)
 
-    # Sinon (chargement normal), on renvoie la page entière
     return render(request, 'statapp/index.html', {'files': files})
 ###
 @login_required

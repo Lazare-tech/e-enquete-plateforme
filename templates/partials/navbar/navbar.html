@@ -11,37 +11,53 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarMainContent">
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 
-        <li class="nav-item me-3"> 
-          <a class="nav-link text-dark fw-medium" href="/">Catalogue de données</a>
-        </li>
+    <li class="nav-item me-3"> 
+        <a class="nav-link text-dark text-decoration-none fw-medium {% if request.resolver_match.url_name == 'search' and not request.GET.category %}active-nav{% endif %}" 
+           href="{% url 'statapp:search' %}">
+           Catalogue de données
+        </a>
+    </li>
 
-        <li class="nav-item dropdown me-3">
-          <a class="nav-link dropdown-toggle text-dark" href="#" id="categoriesDropdown" role="button"
-            data-bs-toggle="dropdown" aria-expanded="false">
-            Catégories
-          </a>
-          <ul class="dropdown-menu border-0 shadow-sm" aria-labelledby="categoriesDropdown">
-            <li><a class="dropdown-item" href="#">Agriculture</a></li>
-            <li><a class="dropdown-item" href="#">Démographie</a></li>
-            <li><a class="dropdown-item" href="#">Économie</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Voir tout</a></li>
-          </ul>
-        </li>
+    <li class="nav-item dropdown me-3">
+        <a class="nav-link dropdown-toggle text-decoration-none text-dark fw-medium {% if request.GET.category %}active-nav{% endif %}" 
+           href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown">
+           Catégories
+        </a>
+        <ul class="dropdown-menu border-0 shadow-sm mt-2" aria-labelledby="categoriesDropdown">
+            {% for cat in all_categories %}
+            <li>
+                <a class="dropdown-item d-flex align-items-center py-2 {% if request.GET.category == cat.slug %}active-sub{% endif %}" 
+                   href="{% url 'statapp:search' %}?category={{ cat.slug }}"
+                   {% if request.resolver_match.url_name == 'search' %}
+                      hx-get="{% url 'statapp:search' %}?category={{ cat.slug }}"
+                      hx-target="#fileGrid"
+                      hx-push-url="true"
+                      hx-swap="innerHTML"
+                      hx-trigger="click"
+                   {% endif %}>
+                  {{ cat.title }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </li>
 
-        <li class="nav-item me-3">
-          <a class="nav-link text-dark" href="{% url 'survey_builder:list' %}">Liste des Formulaires</a>
-        </li>
-        <li class="nav-item me-3">
-          <a class="nav-link text-dark" href="#">Rapports annuels</a>
-        </li>
-        <li class="nav-item me-3">
-          <a class="nav-link text-dark" href="#">Aide & FAQ</a>
-        </li>
-      </ul>
-      
+    <li class="nav-item me-3">
+        <a class="nav-link text-decoration-none text-dark fw-medium {% if 'survey_builder' in request.resolver_match.app_name %}active-nav{% endif %}" 
+           href="{% url 'survey_builder:list' %}">
+           Liste des Formulaires
+        </a>
+    </li>
+
+    <li class="nav-item me-3">
+        <a class="nav-link text-dark text-decoration-none fw-medium {% if request.resolver_match.url_name == 'faq' %}active-nav{% endif %}" 
+           href="{% url 'statapp:faq' %}">
+           Aide & FAQ
+        </a>
+    </li>
+</ul>
       <div class="d-flex align-items-center ms-lg-4"> 
   
   {% if user.is_authenticated %}
@@ -99,7 +115,44 @@
     --shine-blue: #122046;
     --shine-gold: #D4AF37;
 }
+.nav-link {
+    position: relative;
+    padding-bottom: 5px;
+    transition: color 0.3s ease;
+}
 
+/* Le trait décoratif caché par défaut */
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 3px;
+    bottom: -2px;
+    left: 0;
+    background-color: blue;
+    transition: width 0.3s ease;
+    border-radius: 2px;
+}
+
+/* Affichage du trait quand le menu est actif */
+.active-nav::after {
+    width: 100%;
+}
+
+
+
+/* Indicateur pour les sous-catégories dans le dropdown */
+.active-sub {
+    background-color: #f0f4ff;
+    border-left: 4px solid blue;
+    font-weight: bold;
+    color: blue !important;
+}
+
+/* Effet de survol pour les autres menus */
+.nav-link:hover::after {
+    width: 100%;
+}
 .user-avatar-circle {
     width: 40px;
     height: 40px;

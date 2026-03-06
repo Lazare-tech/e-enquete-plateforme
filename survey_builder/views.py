@@ -5,8 +5,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Survey, Submission, Answer
 from .forms import DynamicSurveyForm
 
-def fill_survey(request, survey_id):
-    survey = get_object_or_404(Survey, id=survey_id, is_active=True)
+def fill_survey(request, uid):
+    survey = get_object_or_404(Survey, uid=uid, is_active=True)
     
     if request.method == "POST":
         # Note : on ajoute request.FILES pour les photos

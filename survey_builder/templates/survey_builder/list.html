@@ -2,19 +2,87 @@
 
 {% block content %}
 <div class="container py-5">
-    <h2 class="fw-bold mb-4">Formulaires disponibles</h2>
-    <div class="list-group shadow-sm">
+    <div class="row align-items-center mb-4 g-3">
+        <div class="col-12 col-md-8 text-center text-md-start">
+            <h2 class="fw-bold mb-1 text-primary">Bibliothèque</h2>
+            <p class="text-muted mb-0">Sélectionnez un formulaire pour collecter.</p>
+        </div>
+        <div class="col-12 col-md-4 text-center text-md-end">
+            <span class="badge bg-soft-primary text-primary rounded-pill px-3 py-2 border">
+                {{ surveys|length }} Enquêtes disponibles
+            </span>
+        </div>
+    </div>
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="input-group shadow-sm border rounded-pill overflow-hidden bg-white">
+                <span class="input-group-text border-0 bg-white ps-3">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text" id="surveySearch" class="form-control border-0 py-2" placeholder="Rechercher une enquête...">
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4" id="surveyGrid">
         {% for s in surveys %}
-            <a href="{% url 'survey:fill' s.id %}" class="list-group-item list-group-item-action p-4 d-flex justify-content-between align-items-center">
-                <div>
-                    <h5 class="mb-1 fw-bold">{{ s.title }}</h5>
-                    <p class="mb-0 text-muted small">{{ s.description }}</p>
+        <div class="col-md-6 col-lg-4 survey-item">
+            <div class="card h-100 shadow-sm border-0 hover-lift transition">
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="mb-3 d-flex align-items-center">
+                        <div class="icon-shape bg-primary-light text-primary rounded-3 me-3 p-3">
+                            <i class="fas fa-file-alt fa-lg"></i>
+                        </div>
+                        <h5 class="card-title fw-bold mb-0">{{ s.title }}</h5>
+                    </div>
+                    
+                    <p class="card-text text-muted small flex-grow-1">
+                        {{ s.description|truncatewords:20 }}
+                    </p>
+
+                    <hr class="text-light">
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-auto">
+                        <span class="text-muted extra-small">
+                            <i class="far fa-calendar-alt me-1"></i> {{ s.created_at|date:"d M Y" }}
+                        </span>
+                        <a href="{% url 'survey:fill' s.uid %}" class="btn btn-primary rounded-pill px-4 btn-sm shadow-sm">
+                            Ouvrir <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
                 </div>
-                <i class="fas fa-chevron-right text-primary"></i>
-            </a>
+            </div>
+        </div>
         {% empty %}
-            <p class="text-center p-5 text-muted">Aucun formulaire actif pour le moment.</p>
+        <div class="col-12 text-center py-5">
+            <i class="fas fa-clipboard-list fa-3x text-light mb-3"></i>
+            <p class="text-muted">Aucun formulaire n'est disponible pour le moment.</p>
+        </div>
         {% endfor %}
     </div>
 </div>
+
+<script>
+    document.getElementById('surveySearch').addEventListener('keyup', function() {
+        let filter = this.value.toLowerCase();
+        let items = document.querySelectorAll('.survey-item');
+        
+        items.forEach(item => {
+            let title = item.querySelector('.card-title').innerText.toLowerCase();
+            let desc = item.querySelector('.card-text').innerText.toLowerCase();
+            if (title.includes(filter) || desc.includes(filter)) {
+                item.style.display = "";
+            } else {
+                item.style.display = "none";
+            }
+        });
+    });
+</script>
+
+<style>
+    .bg-primary-light { background-color: rgba(13, 110, 253, 0.1); }
+    .hover-lift:hover { transform: translateY(-5px); box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.1)!important; }
+    .transition { transition: all 0.3s ease; }
+    .extra-small { font-size: 0.75rem; }
+</style>
 {% endblock content %}

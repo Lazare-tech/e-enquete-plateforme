@@ -1,7 +1,10 @@
 from django.contrib import admin
-from .models import Category, StatFile, UserFileAccess
+from .models import Category, StatFile, UserFileAccess,FAQ
 from django.contrib.auth.models import User
 from django import forms
+from adminsortable2.admin import SortableAdminMixin
+from openpyxl.styles import Font, Alignment, PatternFill
+import openpyxl
 ##################33
 # 1. Création d'un formulaire personnalisé pour l'accès
 class UserFileAccessForm(forms.ModelForm):
@@ -70,3 +73,9 @@ class UserFileAccessAdmin(admin.ModelAdmin):
     def user_email(self, obj):
         return obj.user.email
     user_email.short_description = 'Email de l\'utilisateur'
+#####
+@admin.register(FAQ)
+class FAQAdmin(SortableAdminMixin, admin.ModelAdmin):
+    list_display = ('order', 'question', 'is_active')
+    list_editable = ('is_active',) # Permet de masquer une question d'un clic
+    search_fields = ('question', 'answer')

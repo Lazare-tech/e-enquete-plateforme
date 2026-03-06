@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Aide & FAQ | Portail de données collaboratif{% endblock title %}
+{% block meta_description %}
+Besoin d'aide ? Retrouvez les réponses aux questions fréquentes sur l'accès aux données,la collecte sur le terrain et l'utilisation de notre plateforme collaborative.
+{% endblock meta_description %}
+{% block content %}
+<section class="container-fluid bg-light mt-0">
+    <div class="contaier">
+        <div class="text-center mb-5">
+            <span class="badge rounded-pill bg-primary-soft text-primary px-3 py-2 mb-3">Support & Aide</span>
+            <h2 class="fw-bold text-dark display-6">Questions Fréquentes</h2>
+            <div class="separator mx-auto"></div>
+            <p class="text-muted mt-3 mx-auto" style="max-width: 500px;">
+                Retrouvez ici les réponses aux questions les plus posées par nos collaborateurs et partenaires.
+            </p>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="accordion custom-accordion" id="faqAccordion">
+                    {% for item in faqs %}
+                    <div class="accordion-item mb-3 border-0 shadow-sm rounded-4 overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed py-4 px-4 fw-bold" type="button" 
+                                    data-bs-toggle="collapse" data-bs-target="#faq-{{ item.id }}">
+                                <span class="faq-icon me-3"><i class="fas fa-question-circle text-primary"></i></span>
+                                {{ item.question }}
+                            </button>
+                        </h2>
+                        <div id="faq-{{ item.id }}" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body px-4 pb-4 pt-0 text-muted">
+                                <div class="answer-content p-3 rounded-3 bg-light-subtle">
+                                    {{ item.answer|linebreaks }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center p-5 bg-white rounded-4 shadow-sm">
+                        <i class="fas fa-info-circle fa-3x text-light mb-3"></i>
+                        <p class="text-muted fs-5">Le centre d'aide est en cours de mise à jour.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

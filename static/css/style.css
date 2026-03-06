@@ -2,6 +2,7 @@
 
 /* NAVBAR PARTY */
 /* Style spécifique à l'identité visuelle Shine */
+/* Variables d'identité visuelle */
 :root {
     --shine-blue: #122046;
     --shine-gold: #D4AF37;
@@ -22,35 +23,28 @@
     transition: all 0.3s ease;
 }
 
-.user-avatar-circle:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
-}
-
 .dropdown-toggle::after {
     display: none; 
 }
 
-.dropdown-item {
-    transition: 0.2s;
+.nav-link:hover {
+    color: var(--shine-blue) !important;
+    text-decoration: underline;
 }
 
 .dropdown-item:hover {
     background-color: #f8f9fa;
     color: var(--shine-blue);
     padding-left: 1.5rem;
+    transition: padding 0.2s ease;
 }
 
-/* Ajustement pour les boutons personnalisés */
-.btn-primary {
-    background-color: var(--shine-blue);
-    border-color: var(--shine-blue);
+/* Bouton Succès personnalisé pour l'ajout */
+.btn-success {
+    background-color: #28a745;
+    border: none;
 }
 
-.btn-primary:hover {
-    background-color: #1a2f66;
-    border-color: #1a2f66;
-}
 /* END NAVBAR PARTY  */
 /* FOOTER PARTY */
 /* Optimisations Footer */
@@ -81,3 +75,14 @@ footer {
 .border-primary {
     border-color: #D4AF37 !important; /* Utilisation du doré pour les accents */
 }
+/* FAQ PARTY  */
+    /* Customisation aux couleurs de Shine Agency */
+    .accordion-button:not(.collapsed) {
+        background-color: #f8faff;
+        color: #122046;
+        box-shadow: none;
+    }
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: rgba(0,0,0,.125);
+    }

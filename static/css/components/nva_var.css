@@ -1,0 +1,42 @@
+/* Variables d'identité visuelle */
+:root {
+    --shine-blue: #122046;
+    --shine-gold: #D4AF37;
+}
+
+.user-avatar-circle {
+    width: 40px;
+    height: 40px;
+    background-color: var(--shine-blue);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+    border: 2px solid var(--shine-gold);
+    transition: all 0.3s ease;
+}
+
+.dropdown-toggle::after {
+    display: none; 
+}
+
+.nav-link:hover {
+    color: var(--shine-blue) !important;
+    text-decoration: underline;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: var(--shine-blue);
+    padding-left: 1.5rem;
+    transition: padding 0.2s ease;
+}
+
+/* Bouton Succès personnalisé pour l'ajout */
+.btn-success {
+    background-color: #28a745;
+    border: none;
+}

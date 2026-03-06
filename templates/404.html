@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Page non trouvée | Portail de Données{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <div class="row min-vh-100 align-items-center justify-content-center text-center">
+        <div class="col-lg-6">
+            <div class="error-illustration mb-5">
+                <i class="fas fa-database fa-6x text-light-emphasis position-relative">
+                    <span class="position-absolute top-50 start-50 translate-middle text-danger opacity-75" style="font-size: 0.5em;">
+                        <i class="fas fa-search"></i>
+                    </span>
+                </i>
+            </div>
+
+            <h1 class="display-1 fw-bold text-primary mb-2">404</h1>
+            <h2 class="fw-bold text-dark mb-4">Donnée introuvable</h2>
+            <p class="text-muted mb-5 px-md-5">
+                Ce que vous recherchez n'existe pas ou a été déplacé. 
+                Vérifiez l'URL ou utilisez les liens ci-dessous pour reprendre votre navigation.
+            </p>
+
+            <div class="d-grid d-sm-flex justify-content-sm-center gap-3">
+                <a href="/" class="btn btn-primary btn-md px-4 shadow-sm rounded-pill">
+                    <i class="fas fa-home me-2"></i>Retour au Catalogue
+                </a>
+               
+            </div>
+
+            <p class="mt-5 small text-muted">
+                Si vous pensez qu'il s'agit d'une erreur technique, 
+                <a href="#" class="text-decoration-underline">contactez l'administrateur</a>.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_css %}
+<style>
+    /* Effet d'animation doux pour l'icône */
+    .error-illustration i {
+        animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+    }
+
+    .text-light-emphasis { color: #e9ecef !important; }
+</style>
+{% endblock extra_css %}

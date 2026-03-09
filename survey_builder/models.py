@@ -12,7 +12,11 @@ class Survey(models.Model):
     description = models.TextField(blank=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True,verbose_name="Enquête visible sur le site")
+    #
+    class Meta:
+        verbose_name = "Enquête"
+        verbose_name_plural = "Enquêtes"
 
     def __str__(self):
         return self.title

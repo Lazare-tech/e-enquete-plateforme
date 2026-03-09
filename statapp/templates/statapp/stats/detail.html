@@ -62,48 +62,69 @@
         </div>
 
         <div class="col-lg-4">
-            <div class="card border-0 shadow-lg sticky-top" style="top: 2rem; z-index: 10;">
-                <div class="card-body p-4 text-center">
-                    <h5 class="fw-bold mb-4">Accès au fichier</h5>
+    <div class="card border-0 shadow-lg sticky-top" style="top: 2rem; z-index: 10;">
+        <div class="card-body p-4 text-center">
+            <h5 class="fw-bold mb-4">Accès au fichier</h5>
 
-                    {% if has_access %}
-                        <div class="icon-access-wrapper mb-4">
-                            <i class="fas fa-unlock-alt fa-4x text-success"></i>
-                        </div>
-                        <div class="alert alert-success border-0 small mb-4">
-                            <i class="fas fa-check-circle me-2"></i> Votre accès a été validé par l'agence.
-                        </div>
-                        <a href="{% url 'statapp:download' file.id %}" class="btn btn-success btn-lg w-100 py-3 shadow-sm mb-3">
-                            <i class="fas fa-download me-2"></i> Télécharger ({{ file.get_extension|upper }})
-                        </a>
-                        <p class="text-muted small">Fichier prêt pour analyse.</p>
-                        
-                    {% else %}
-                        <div class="icon-lock-wrapper mb-4">
-                            <i class="fas fa-lock fa-4x text-warning opacity-25"></i>
-                        </div>
-                        
-                        <p class="text-muted mb-4 small">
-                            Ce fichier est protégé. Pour le télécharger, veuillez demander une autorisation spécifique.
-                        </p>
-
-                      <a href="https://wa.me/22667487164?text=Bonjour,%20je%20souhaite%20accéder%20au%20fichier%20:%20{{ file.title|urlencode }}" 
-                    target="_blank" 
-                    class="btn btn-dark btn-lg w-100 py-3 shadow-sm mb-3">
+            {% if user.is_authenticated %}
+                {% if has_access %}
+                    <div class="icon-access-wrapper mb-4">
+                        <i class="fas fa-unlock-alt fa-4x text-success"></i>
+                    </div>
+                    <div class="alert alert-success border-0 small mb-4">
+                        <i class="fas fa-check-circle me-2"></i> Votre accès a été validé.
+                    </div>
+                    <a href="{% url 'statapp:download' file.id %}" class="btn btn-success btn-lg w-100 py-3 shadow-sm mb-3">
+                        <i class="fas fa-download me-2"></i> Télécharger ({{ file.get_extension|upper }})
+                    </a>
+                    <p class="text-muted small">Fichier prêt pour analyse.</p>
+                
+                {% else %}
+                    <div class="icon-lock-wrapper mb-4">
+                        <i class="fas fa-lock fa-4x text-warning opacity-50"></i>
+                    </div>
+                    <p class="text-muted mb-4 small">
+                        Ce fichier est restreint. Veuillez demander une autorisation spécifique à l'équipe.
+                    </p>
+                    <a href="https://wa.me/22667487164?text=Bonjour,%20je%20souhaite%20accéder%20au%20fichier%20:%20{{ file.title|urlencode }}" 
+                       target="_blank" class="btn btn-dark btn-lg w-100 py-3 shadow-sm mb-3">
                         <i class="fab fa-whatsapp me-2 text-success"></i> Demander l'accès
                     </a>
-                        <div class="bg-light p-3 rounded-3 text-start mt-2">
-                            <small class="text-muted fw-bold"><i class="fas fa-info-circle me-2"></i> Procédure :</small>
-                            <ul class="list-unstyled small mb-0 mt-2 text-muted">
-                                <li>1. Soumettez votre demande WhatsApp</li>
-                                <li>2. Vérification de votre identité</li>
-                                <li>3. Activation instantanée de l'accès</li>
-                            </ul>
-                        </div>
-                    {% endif %}
+                    <div class="bg-light p-3 rounded-3 text-start mt-2">
+                        <small class="text-muted fw-bold"><i class="fas fa-info-circle me-2"></i> Procédure :</small>
+                        <ul class="list-unstyled small mb-0 mt-1 text-muted">
+                            <li>1. Soumettez votre demande WhatsApp</li>
+                            <li>2. Activation après vérification</li>
+                        </ul>
+                    </div>
+                {% endif %}
+
+            {% else %}
+                <div class="icon-lock-wrapper mb-4">
+                    <i class="fas fa-user-lock fa-4x text-secondary opacity-25"></i>
                 </div>
-            </div>
+                <h6 class="fw-bold">Connexion requise</h6>
+                <p class="text-muted mb-4 small">
+                    Pour demander l'accès à ce fichier de données, vous devez d'abord posséder un compte sur notre plateforme.
+                </p>
+                
+                <div class="d-grid gap-2">
+                    <a href="{% url 'statapp:login' %}?next={{ request.path }}" class="btn btn-primary btn-sm py-3 rounded-pill shadow-sm">
+                        Se connecter
+                    </a>
+                    <a href="{% url 'statapp:register' %}" class="btn btn-link btn-sm text-decoration-none text-muted">
+                        Pas encore de compte ? S'inscrire
+                    </a>
+                </div>
+
+                <div class="alert alert-warning border-0 small mt-4 text-start">
+                    <i class="fas fa-exclamation-triangle me-2"></i> 
+                    L'accès aux données est réservé aux membres identifiés de l'équipe et aux partenaires.
+                </div>
+            {% endif %}
         </div>
+    </div>
+</div>
     </div>
 </div>
 

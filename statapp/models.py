@@ -56,6 +56,8 @@ class StatFile(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+        verbose_name = "Fichier statistique"
+        verbose_name_plural = "Fichiers statistiques"
 ############################################################
 class UserFileAccess(models.Model):
     user = models.ForeignKey('auth.User', on_delete=models.CASCADE)

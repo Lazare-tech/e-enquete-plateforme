@@ -5,6 +5,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Survey, Submission, Answer
 from .forms import DynamicSurveyForm
 
+#########################
+
 def fill_survey(request, uid):
     survey = get_object_or_404(Survey, uid=uid, is_active=True)
     
@@ -46,3 +48,5 @@ def survey_list(request):
 #
 def survey_success(request):
     return render(request, 'survey_builder/success.html')
+#############
+

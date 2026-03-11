@@ -86,14 +86,34 @@
                     <p class="text-muted mb-4 small">
                         Ce fichier est restreint. Veuillez demander une autorisation spécifique à l'équipe.
                     </p>
-                    <a href="https://wa.me/22667487164?text=Bonjour,%20je%20souhaite%20accéder%20au%20fichier%20:%20{{ file.title|urlencode }}" 
-                       target="_blank" class="btn btn-dark btn-lg w-100 py-3 shadow-sm mb-3">
-                        <i class="fab fa-whatsapp me-2 text-success"></i> Demander l'accès
-                    </a>
+                        <div class="text-center">
+    <span class="badge bg-dark px-3 py-2 mb-4 rounded-pill">Demander l'accès via :</span>
+
+    <div class="d-flex justify-content-center align-items-center gap-4">
+        
+        <a href="mailto:yelmaniyel@gmail.com?subject=Demande d'accès:{{ file.title|urlencode }}" 
+           class="text-decoration-none transition-hover" 
+           title="Envoyer un Email">
+            <i class="fas fa-envelope fa-3x text-primary"></i>
+            <small class="d-block text-muted mt-2">Email</small>
+        </a>
+
+        <a href="https://wa.me/22667487164?text=Bonjour,je souhaite accéder au fichier:{{ file.title|urlencode }}" 
+           target="_blank" 
+           class="text-decoration-none transition-hover" 
+           title="Contacter sur WhatsApp">
+            <i class="fab fa-whatsapp fa-3x text-success"></i>
+            <small class="d-block text-muted mt-2">WhatsApp</small>
+        </a>
+
+    </div>
+</div>
+
+
                     <div class="bg-light p-3 rounded-3 text-start mt-2">
                         <small class="text-muted fw-bold"><i class="fas fa-info-circle me-2"></i> Procédure :</small>
                         <ul class="list-unstyled small mb-0 mt-1 text-muted">
-                            <li>1. Soumettez votre demande WhatsApp</li>
+                            <li>1. Soumettez votre demande WhatsApp ou par E-mail</li>
                             <li>2. Activation après vérification</li>
                         </ul>
                     </div>

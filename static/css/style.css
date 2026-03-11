@@ -6,7 +6,16 @@
 :root {
     --shine-blue: #122046;
     --shine-gold: #D4AF37;
+    --btn-button-success: #28a745;
+    --btn-button-primary: #003d7a;
 }
+/* Vos styles restent identiques */
+.hover-lift { transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); }
+.hover-lift:hover { transform: translateY(-8px); box-shadow: 0 1rem 3rem rgba(0,0,0,0.1) !important; }
+.text-truncate-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; min-height: 4.5em; }
+.badge { font-size: 0.75rem; padding: 0.5em 1em; font-weight: 600; }
+.btn-button-primary {  background-color: var(--btn-button-primary); }
+
 
 .user-avatar-circle {
     width: 40px;
@@ -85,4 +94,13 @@ footer {
     .accordion-button:focus {
         box-shadow: none;
         border-color: rgba(0,0,0,.125);
+    }
+/* DETAIL FILE  */
+    /* Petit effet au survol pour rendre l'interface vivante */
+    .transition-hover {
+        transition: transform 0.2s ease-in-out, opacity 0.2s;
+    }
+    .transition-hover:hover {
+        transform: scale(1.1);
+        opacity: 0.8;
     }

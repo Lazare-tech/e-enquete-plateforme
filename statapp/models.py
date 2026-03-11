@@ -7,7 +7,7 @@ import os
 
 class Category(models.Model):
     """Permet de classer les données (ex: Économie, Santé, Démographie)"""
-    title = models.CharField(max_length=100, verbose_name="Titre de la catégorie")
+    title = models.CharField(max_length=100, verbose_name="Titre de la catégorie",unique=True)
     slug = models.SlugField(unique=True, blank=True)
     icon = models.CharField(
         max_length=50, 
@@ -39,12 +39,19 @@ class StatFile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     download_count = models.PositiveIntegerField(default=0, verbose_name="Nombre de téléchargements")
-    is_active = models.BooleanField(default=True, verbose_name="Visible sur le site")
+    is_active = models.BooleanField(default=False, verbose_name="Visible sur le site")
 
     # AJOUTER CETTE MÉTHODE POUR AUTO-GÉNÉRER LE SLUG
     def save(self, *args, **kwargs):
         if not self.slug and self.title:
-            self.slug = slugify(self.title)
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
+            # Sécurité anti-doublon pour le slug unique
+            while StatFile.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
         super().save(*args, **kwargs)
 
     def get_extension(self):
@@ -58,6 +65,35 @@ class StatFile(models.Model):
         ordering = ['-created_at']
         verbose_name = "Fichier statistique"
         verbose_name_plural = "Fichiers statistiques"
+#############################################################################################
+class VariableCategory(models.Model):
+    title = models.CharField(max_length=100, unique=True, blank=True,null=True,verbose_name="Nom de la catégorie")
+    slug = models.SlugField(unique=True, blank=True)
+    is_active = models.BooleanField(default=False, verbose_name="Validée (Visible)")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Catégorie de Variable"
+        ordering = ['title']
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        status = "✅" if self.is_active else "⏳"
+        return f"{status} {self.title}"
+    
+class StatVariable(models.Model):
+    category = models.ForeignKey(VariableCategory, on_delete=models.CASCADE, related_name="variables")
+    label = models.CharField(max_length=255, verbose_name="Nom de la variable")
+    value = models.CharField(max_length=255, verbose_name="Valeur / Information")
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True)
+
+    def __title__(self):
+        return f"{self.label} : {self.value}"
 ############################################################
 class UserFileAccess(models.Model):
     user = models.ForeignKey('auth.User', on_delete=models.CASCADE)

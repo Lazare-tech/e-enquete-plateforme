@@ -7,9 +7,10 @@ urlpatterns = [
    path('', statapp.views.homepage, name='homepage'),
    path('faq/', statapp.views.faq_view, name='faq'),
    path('detail/<slug:slug>/', statapp.views.detail_stat, name='detail'),
-   path('recherche/', statapp.views.search_files, name='search'),
+   path('catalogue/', statapp.views.search_files, name='search'),
    path('telecharger/<int:file_id>/', statapp.views.download_stat_file, name='download'),
-   
+   path('ajout/', statapp.views.add_data_view, name='add_data'),
+   path('categorie/check/', statapp.views.check_category, name='check_category'),
    ################################################################################
    path('connexion/', statapp.views.UserLoginView.as_view(), name='login'),
    path('inscription/', statapp.views.UserRegisterView.as_view(), name='register'),

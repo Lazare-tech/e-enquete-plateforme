@@ -61,11 +61,9 @@
       <div class="d-flex align-items-center ms-lg-4"> 
   
   {% if user.is_authenticated %}
-    {% if user.is_staff %}
-    <a class="fw-bold text-white btn btn-success btn-sm me-3 px-3 py-2 shadow-sm" href="{% url 'admin:index' %}">
+    <a class="fw-bold text-white btn btn-success btn-button-success btn-sm me-3 px-3 py-2 shadow-sm" href="{% url 'statapp:add_data' %}">
       <i class="fas fa-plus-circle me-1"></i> Ajouter des données
     </a>
-    {% endif %}
 
     <div class="dropdown">
       <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -92,10 +90,10 @@
     </div>
 
   {% else %}
-    <a href="{% url 'statapp:login' %}" class="btn btn-outline-primary btn-sm me-2 px-3 rounded-pill">
+    <a href="{% url 'statapp:login' %}" class="btn btn-outline-primary btn-button-primary btn-sm me-2 px-3 rounded-pill">
       Se connecter
     </a>
-    <a href="{% url 'statapp:register' %}" class="btn btn-primary btn-sm px-3 rounded-pill shadow-sm">
+    <a href="{% url 'statapp:register' %}" class="btn btn-primary btn-button-primary btn-sm px-3 rounded-pill shadow-sm">
       S'inscrire
     </a>
   {% endif %}

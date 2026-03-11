@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, StatFile, UserFileAccess,FAQ
+from .models import Category, StatFile, UserFileAccess,FAQ,StatVariable,VariableCategory
 from django.contrib.auth.models import User
 from django import forms
 from adminsortable2.admin import SortableAdminMixin
@@ -30,6 +30,7 @@ class UserFileAccessInline(admin.TabularInline):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('title', 'slug', 'icon')
+    # list_editable = ('is_active',) 
     prepopulated_fields = {'slug': ('title',)}
     search_fields = ('title',)
 
@@ -79,3 +80,22 @@ class FAQAdmin(SortableAdminMixin, admin.ModelAdmin):
     list_display = ('order', 'question', 'is_active')
     list_editable = ('is_active',) # Permet de masquer une question d'un clic
     search_fields = ('question', 'answer')
+#####
+@admin.register(VariableCategory)
+class VariableCategoryAdmin(admin.ModelAdmin):
+    list_display = ('title', 'is_active', 'created_at', 'variable_count')
+    list_editable = ('is_active',) # Validez d'un clic dans la liste !
+    list_filter = ('is_active',)
+    search_fields = ('title',)
+
+    def variable_count(self, obj):
+        return obj.variables.count()
+    variable_count.short_description = "Nombre de variables"
+
+@admin.register(StatVariable)
+class StatVariableAdmin(admin.ModelAdmin):
+    list_display = ('label', 'value', 'category', 'created_by')
+    list_filter = ('category', 'category__is_active')
+    search_fields = ('label', 'value')
+    # Permet de changer de catégorie directement dans la liste
+    list_editable = ('category',)

@@ -1,8 +1,7 @@
 from django import forms
 
 from django import forms
-from django import forms
-
+###########################################################
 class DynamicSurveyForm(forms.Form):
     def __init__(self, survey, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -57,3 +56,4 @@ class DynamicSurveyForm(forms.Form):
                     label=label, required=required,
                     widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
                 )
+#######################

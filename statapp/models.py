@@ -40,6 +40,13 @@ class StatFile(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     download_count = models.PositiveIntegerField(default=0, verbose_name="Nombre de téléchargements")
     is_active = models.BooleanField(default=False, verbose_name="Visible sur le site")
+    created_by = models.ForeignKey(
+        'auth.User', 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        verbose_name="Ajouté par"
+    )
 
     # AJOUTER CETTE MÉTHODE POUR AUTO-GÉNÉRER LE SLUG
     def save(self, *args, **kwargs):
@@ -90,7 +97,7 @@ class StatVariable(models.Model):
     label = models.CharField(max_length=255, verbose_name="Nom de la variable")
     value = models.CharField(max_length=255, verbose_name="Valeur / Information")
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True)
+    created_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Ajouté par")
 
     def __title__(self):
         return f"{self.label} : {self.value}"

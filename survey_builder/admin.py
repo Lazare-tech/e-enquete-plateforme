@@ -19,12 +19,21 @@ class OptionInline(SortableTabularInline):
 class QuestionInline(admin.StackedInline):
     model = Question
     extra = 1
-    show_change_link = True # Permet d'ouvrir la question en grand si besoin
+    show_change_link = True
+    # On organise les champs pour que la logique de saut soit bien visible
     fieldsets = (
-        (None, {
+        ('Configuration de base', {
             'fields': (('label', 'question_type'), ('required', 'order'))
         }),
+        ('Logique de saut (Optionnel)', {
+            'fields': (('depends_on', 'dependency_value'),),
+            'description': "Affiche cette question uniquement si une réponse spécifique est donnée à une autre.",
+            'classes': ('collapse',), # Cache cette section par défaut pour ne pas encombrer
+        }),
     )
+    
+    # Pour pouvoir sélectionner facilement la question parente
+    autocomplete_fields = ['depends_on']
 ###########################################
 def export_survey_to_csv(modeladmin, request, queryset):
     # On prend le premier questionnaire sélectionné pour l'exemple
@@ -168,19 +177,22 @@ from django.contrib.admin import SimpleListFilter
 
 @admin.register(Question)
 class QuestionAdmin(SortableAdminMixin, admin.ModelAdmin):
-    # On affiche clairement à quel formulaire appartient la question
+    # 1. On affiche les colonnes importantes
     list_display = ('label', 'survey_name', 'order', 'question_type')
     
-    # On force le filtre sur le Survey uniquement
-    # 'admin.RelatedOnlyFieldListFilter' permet de ne montrer que les 
-    # formulaires qui possèdent réellement des questions.
+    # 2. RÉACTIVATION DE LA RECHERCHE
+    # Permet de chercher par le texte de la question OU le titre du formulaire
+    search_fields = ('label', 'survey__title')
+    
+    # 3. FILTRES LATERAUX
     list_filter = (
         ('survey', admin.RelatedOnlyFieldListFilter),
         'question_type',
     )
     
-    # Recherche par nom de formulaire pour filtrer au clavier
-    search_fields = ('label', 'survey__title')
+    # 4. GESTION DES CHOIX (Radio/Checkbox)
+    # C'est ici que tu peux ajouter tes options (Choix unique/multiple)
+    inlines = [OptionInline]
     
     ordering = ('survey', 'order')
 

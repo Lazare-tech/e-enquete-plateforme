@@ -9,7 +9,7 @@ from .forms import DynamicSurveyForm
 
 def fill_survey(request, uid):
     survey = get_object_or_404(Survey, uid=uid, is_active=True)
-    
+    questions = survey.questions.all().prefetch_related('options').order_by('order')
     if request.method == "POST":
         # Note : on ajoute request.FILES pour les photos
         form = DynamicSurveyForm(survey, request.POST, request.FILES) 
@@ -39,8 +39,11 @@ def fill_survey(request, uid):
             return redirect('survey_builder:success')
     else:
         form = DynamicSurveyForm(survey)
-
-    return render(request, 'survey_builder/fill_survey.html', {'survey': survey, 'form': form})
+    context={
+        'survey':survey,
+        'questions':questions
+    }
+    return render(request, 'survey_builder/fill_survey.html', context)
 #
 def survey_list(request):
     surveys = Survey.objects.filter(is_active=True)

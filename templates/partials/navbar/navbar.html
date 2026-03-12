@@ -21,28 +21,29 @@
     </li>
 
     <li class="nav-item dropdown me-3">
-        <a class="nav-link dropdown-toggle text-decoration-none text-dark fw-medium {% if request.GET.category %}active-nav{% endif %}" 
-           href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown">
-           Catégories
-        </a>
-        <ul class="dropdown-menu border-0 shadow-sm mt-2" aria-labelledby="categoriesDropdown">
-            {% for cat in all_categories %}
-            <li>
-                <a class="dropdown-item d-flex align-items-center py-2 {% if request.GET.category == cat.slug %}active-sub{% endif %}" 
-                   href="{% url 'statapp:search' %}?category={{ cat.slug }}"
-                   {% if request.resolver_match.url_name == 'search' %}
-                      hx-get="{% url 'statapp:search' %}?category={{ cat.slug }}"
-                      hx-target="#fileGrid"
-                      hx-push-url="true"
-                      hx-swap="innerHTML"
-                      hx-trigger="click"
-                   {% endif %}>
-                  {{ cat.title }}
-                </a>
-            </li>
-            {% endfor %}
-        </ul>
-    </li>
+    <a class="nav-link dropdown-toggle text-decoration-none text-dark fw-medium {% if request.GET.category %}active-nav{% endif %}" 
+       href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+       Catégories
+    </a>
+    <ul class="dropdown-menu border-0 shadow-sm mt-2" aria-labelledby="categoriesDropdown">
+        {% for cat in all_categories %}
+        <li>
+            <a class="dropdown-item d-flex align-items-center py-2 {% if request.GET.category == cat.slug %}active-sub{% endif %}" 
+               href="{% url 'statapp:search' %}?category={{ cat.slug }}"
+               {% if request.resolver_match.url_name == 'search' %}
+                  hx-get="{% url 'statapp:search' %}?category={{ cat.slug }}"
+                  hx-target="#fileGrid"
+                  hx-push-url="true"
+                  hx-trigger="click"
+               {% endif %}>
+              {{ cat.title }}
+            </a>
+        </li>
+        {% empty %}
+        <li class="px-3 small text-muted">Aucune catégorie</li>
+        {% endfor %}
+    </ul>
+</li>
 
     <li class="nav-item me-3">
         <a class="nav-link text-decoration-none text-dark fw-medium {% if 'survey_builder' in request.resolver_match.app_name %}active-nav{% endif %}" 

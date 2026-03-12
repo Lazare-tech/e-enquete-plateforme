@@ -24,13 +24,14 @@ class Survey(models.Model):
 class Question(models.Model):
     """Une question spécifique dans un formulaire"""
     TYPE_CHOICES = [
+        ('section', '---Titre de Section / Groupe---'),
         ('text', 'Texte court'),
         ('textarea', 'Paragraphe (Texte long)'),
         ('number', 'Nombre'),
         ('select', 'Choix unique'),
-        ('textarea', 'Paragraphe (Texte long)'),
         ('date', 'Date'),
         ('image', 'Photo/Image'),
+        ('audio', 'Enregistrement audio'),
     ]
     
     survey = models.ForeignKey(Survey, related_name="questions", on_delete=models.CASCADE)
@@ -38,7 +39,12 @@ class Question(models.Model):
     question_type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     required = models.BooleanField(default=True)
     order = models.PositiveIntegerField(default=0, db_index=True) # Ajoute db_index pour la performance
-
+    ##
+    # Si cette question dépend d'une autre :
+    depends_on = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name="dependent_questions")
+    # La valeur qui doit être répondue à "depends_on" pour afficher CETTE question
+    dependency_value = models.CharField(max_length=255, blank=True, null=True, help_text="Valeur de l'option qui débloque cette question")
+    
     class Meta:
         ordering = ['order']
         
@@ -69,6 +75,12 @@ class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     value = models.TextField() # On stocke tout en texte, à convertir selon le type
     ####
+    file_upload = models.FileField(
+        upload_to='enquete/responses/%Y/%m/', 
+        blank=True, 
+        null=True,
+        verbose_name="Fichier joint (Image/Audio)"
+    )
     def __str__(self):
         # Affiche la question et la réponse donnée
         return f"{self.question.label}"

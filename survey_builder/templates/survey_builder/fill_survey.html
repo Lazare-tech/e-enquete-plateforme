@@ -1,58 +1,150 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-sm border-0 mb-4 rounded-3 overflow-hidden">
-                <div class="card-header bg-primary py-3"></div>
-                <div class="card-body p-4">
-                    <h1 class="display-6 fw-bold text-dark">{{ survey.title }}</h1>
-                    <p class="lead text-muted">{{ survey.description }}</p>
-                </div>
-            </div>
-
-            <form method="post" enctype="multipart/form-data" class="needs-validation">
-                {% csrf_token %}
-                
-                {% for field in form %}
-                <div class="card shadow-sm border-0 mb-3 question-card">
-                    <div class="card-body p-4">
-                        <label class="form-label fw-bold mb-3 d-block h5">
-                            {{ field.label }}
-                            {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
-                        </label>
-                        
-                        <div class="field-container">
-                            {{ field }}
-                        </div>
-
-                        {% if field.errors %}
-                        <div class="alert alert-danger mt-2 py-2">
-                            {{ field.errors }}
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-                {% endfor %}
-
-                <div class="d-grid gap-2 mt-5">
-                    <button type="submit" class="btn btn-primary btn-lg py-3 shadow">
-                        <i class="fas fa-check-circle me-2"></i> Soumettre le formulaire
-                    </button>
-                </div>
-            </form>
+<div class="container py-5" style="max-width: 900px;">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold text-dark">{{ survey.title }}</h1>
+        <p class="text-muted mx-auto" style="max-width: 600px;">{{ survey.description }}</p>
+        <div class="progress mt-4" style="height: 6px; border-radius: 10px;">
+            <div id="surveyProgressBar" class="progress-bar bg-primary" role="progressbar" style="width: 0%;"></div>
         </div>
     </div>
+
+    <form method="post" enctype="multipart/form-data" id="survey-form" class="pb-5">
+        {% csrf_token %}
+        
+        {% for question in questions %} 
+            {% if question.question_type == 'section' %}
+                <div class="section-header mt-5 mb-4 animate__animated animate__fadeIn">
+                    <h5 class="fw-bold text-primary text-uppercase letter-spacing-1">
+                        <i class="fas fa-list-ul me-2"></i>{{ question.label }}
+                    </h5>
+                    <hr class="mt-2 opacity-10">
+                </div>
+            {% else %}
+                <div class="card shadow-sm border-0 mb-4 question-card animate__animated" 
+                     id="q-{{ question.id }}"
+                     data-depends-on="{{ question.depends_on.id|default:'' }}"
+                     data-depends-value="{{ question.dependency_value|default:'' }}"
+                     {% if question.depends_on %}style="display: none; opacity: 0;"{% endif %}>
+                    
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="badge bg-light text-primary rounded-circle me-2 p-2 shadow-sm" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">{{ forloop.counter }}</span>
+                            <label class="form-label fw-semibold mb-0 h6">
+                                {{ question.label }}
+                                {% if question.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                        </div>
+                        
+                        <div class="field-container">
+                            {% if question.question_type == 'text' %}
+                                <input type="text" name="question_{{ question.id }}" class="form-control custom-input" {% if question.required %}required{% endif %}>
+                            
+                            {% elif question.question_type == 'textarea' %}
+                                <textarea name="question_{{ question.id }}" class="form-control custom-input" rows="3" {% if question.required %}required{% endif %}></textarea>
+
+                            {% elif question.question_type == 'number' %}
+                                <input type="number" name="question_{{ question.id }}" class="form-control custom-input" {% if question.required %}required{% endif %}>
+
+                            {% elif question.question_type == 'select' %}
+                                <select name="question_{{ question.id }}" class="form-select custom-input dep-trigger" {% if question.required %}required{% endif %}>
+                                    <option value="">Sélectionnez une option</option>
+                                    {% for option in question.options.all %}
+                                        <option value="{{ option.value }}">{{ option.text }}</option>
+                                    {% endfor %}
+                                </select>
+
+                            {% elif question.question_type == 'date' %}
+                                <input type="date" name="question_{{ question.id }}" class="form-control custom-input" {% if question.required %}required{% endif %}>
+
+                            {% elif question.question_type == 'image' %}
+                                <div class="file-input-wrapper">
+                                    <input type="file" name="question_{{ question.id }}" accept="image/*" class="form-control" {% if question.required %}required{% endif %}>
+                                </div>
+
+                            {% elif question.question_type == 'audio' %}
+                                <div class="file-input-wrapper">
+                                    <input type="file" name="question_{{ question.id }}" accept="audio/*" capture="microphone" class="form-control" {% if question.required %}required{% endif %}>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        <div class="d-grid gap-2 mt-5">
+            <button type="submit" class="btn btn-primary btn-lg py-3 rounded-3 shadow-lg border-0">
+                <i class="fas fa-paper-plane me-2"></i> Envoyer le rapport
+            </button>
+        </div>
+    </form>
 </div>
 
 <style>
-    body { background-color: #f8f9fa; }
-    .question-card { border-left: 5px solid #0d6efd !important; transition: 0.3s; }
-    .question-card:hover { transform: translateX(5px); }
-    /* Style pour les listes de cases à cocher et radios */
-    ul { list-style: none; padding-left: 0; }
-    li { margin-bottom: 8px; }
-    .form-check-input { margin-right: 10px; }
+    :root { --shine-blue: #122046; }
+    body { background-color: #f4f7f6; font-family: 'Inter', sans-serif; }
+    .question-card { border-radius: 15px; border-left: 0; transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); }
+    .question-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important; }
+    .custom-input { border: 2px solid #edf2f7; padding: 12px; border-radius: 10px; transition: all 0.3s; }
+    .custom-input:focus { border-color: var(--shine-blue); box-shadow: none; background-color: #fff; }
+    .progress-bar { transition: width 0.6s ease; }
+    .animate__fadeIn { animation: fadeIn 0.5s both; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('survey-form');
+    const progressBar = document.getElementById('surveyProgressBar');
+
+    function updateSurveyProgress() {
+        const total = document.querySelectorAll('.question-card:not([style*="display: none"])').length;
+        const filled = Array.from(document.querySelectorAll('.question-card:not([style*="display: none"]) input, .question-card:not([style*="display: none"]) select'))
+                            .filter(i => i.value !== "").length;
+        const percent = (filled / total) * 100;
+        progressBar.style.width = percent + '%';
+    }
+
+    function checkLogic() {
+        const cards = document.querySelectorAll('.question-card');
+        cards.forEach(card => {
+            const parentId = card.dataset.dependsOn;
+            const targetValue = card.dataset.dependsValue;
+
+            if (parentId) {
+                const parentField = form.querySelector(`[name="question_${parentId}"]`);
+                if (parentField) {
+                    // Vérification stricte et insensible aux espaces
+                    const isMatch = parentField.value.trim() === targetValue.trim();
+                    
+                    if (isMatch) {
+                        if (card.style.display === 'none') {
+                            card.style.display = 'block';
+                            card.classList.add('animate__fadeIn');
+                            card.querySelectorAll('input, select, textarea').forEach(i => i.disabled = false);
+                        }
+                    } else {
+                        card.style.display = 'none';
+                        card.classList.remove('animate__fadeIn');
+                        const input = card.querySelector('input, select, textarea');
+                        if (input) {
+                            input.disabled = true;
+                            input.value = ''; // On vide pour la cohérence des données
+                        }
+                    }
+                }
+            }
+        });
+        updateSurveyProgress();
+    }
+
+    // "input" est plus rapide que "change" pour les champs texte
+    form.addEventListener('input', checkLogic);
+    
+    // Initialisation
+    checkLogic();
+});
+</script>
 {% endblock content %}

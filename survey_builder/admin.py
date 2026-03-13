@@ -18,12 +18,12 @@ class OptionInline(SortableTabularInline):
 # 2. Permet d'ajouter des questions directement sous le questionnaire
 class QuestionInline(admin.StackedInline):
     model = Question
-    extra = 1
+    extra = 0
     show_change_link = True
     # On organise les champs pour que la logique de saut soit bien visible
     fieldsets = (
         ('Configuration de base', {
-            'fields': (('label', 'question_type'), ('required', 'order'))
+            'fields': (('question_type', 'order'), 'label', 'help_text', 'required')
         }),
         ('Logique de saut (Optionnel)', {
             'fields': (('depends_on', 'dependency_value'),),
@@ -34,99 +34,113 @@ class QuestionInline(admin.StackedInline):
     
     # Pour pouvoir sélectionner facilement la question parente
     autocomplete_fields = ['depends_on']
+    class Media:
+        js = ('js/admin_enq.js',) # Chemin vers ton fichier JS
 ###########################################
 def export_survey_to_csv(modeladmin, request, queryset):
-    # On prend le premier questionnaire sélectionné pour l'exemple
-    # (Ou on boucle si on veut fusionner, mais l'export par questionnaire est plus logique)
-    for survey in queryset:
-        response = HttpResponse(content_type='text/csv')
-        # Nom du fichier dynamique : ex_recensement_eau_2026-03-06.csv
-        filename = f"export_{survey.title.lower().replace(' ', '_')}_{datetime.now().strftime('%Y-%m-%d')}.csv"
-        response['Content-Disposition'] = f'attachment; filename="{filename}"'
-        
-        writer = csv.writer(response)
-        
-        # 1. Préparation des En-têtes (Colonnes)
-        questions = survey.questions.all().order_by('order')
-        headers = ['ID Soumission', 'Date', 'Enquêteur'] + [q.label for q in questions]
-        writer.writerow(headers)
-        
-        # 2. Récupération des données (Lignes)
-        submissions = Submission.objects.filter(survey=survey).prefetch_related('answers')
-        
-        for sub in submissions:
-            row = [sub.id, sub.submitted_at.strftime("%d/%m/%Y %H:%M"), sub.enumerator.username if sub.enumerator else "Anonyme"]
-            
-            # Pour chaque question du questionnaire, on cherche la réponse correspondante
-            answers_dict = {a.question_id: a.value for a in sub.answers.all()}
-            for q in questions:
-                row.append(answers_dict.get(q.id, "")) # On met vide si pas de réponse
-            
-            writer.writerow(row)
-            
-        return response # Renvoie le fichier pour le premier survey coché
-
-export_survey_to_csv.short_description = "Exporter les réponses en CSV"
-####
-def export_survey_to_excel(modeladmin, request, queryset):
-    # On crée un nouveau classeur Excel
-    wb = openpyxl.Workbook()
+    # On prend la première enquête sélectionnée (ou on peut boucler pour faire un ZIP)
+    survey = queryset.first()
+    if not survey:
+        return
     
-    for survey in queryset:
-        # On crée une feuille par questionnaire (ou on utilise la première)
-        ws = wb.active
-        ws.title = "Réponses"
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    filename = f"export_{survey.id}_{datetime.now().strftime('%Y%m%d')}.csv"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    # Correction pour les caractères accentués en Excel
+    response.write(u'\ufeff'.encode('utf8'))
+    writer = csv.writer(response)
+    
+    # En-têtes
+    questions = survey.questions.exclude(question_type__in=['Entete', 'section']).order_by('order')
+    headers = ['ID Soumission', 'Date', 'Enquêteur'] + [q.label for q in questions]
+    writer.writerow(headers)
+    
+    # URL de base pour les fichiers média
+    base_url = request.build_absolute_uri('/')[:-1]
+    
+    submissions = Submission.objects.filter(survey=survey).prefetch_related('answers')
+    
+    for sub in submissions:
+        row = [
+            sub.id, 
+            sub.submitted_at.strftime("%d/%m/%Y %H:%M"), 
+            sub.enumerator.username if sub.enumerator else "Anonyme"
+        ]
         
-        # --- STYLE DES EN-TÊTES ---
-        header_font = Font(bold=True, color="FFFFFF")
-        header_fill = PatternFill(start_color="122046", end_color="122046", fill_type="solid") # Bleu Shine
-        alignment = Alignment(horizontal="center", vertical="center")
-
-        # 1. PRÉPARATION DES COLONNES
-        questions = survey.questions.all().order_by('order')
-        headers = ['ID', 'Date de soumission', 'Enquêteur'] + [q.label for q in questions]
+        # Dictionnaire des réponses (Texte ou URL complète pour fichier)
+        answers_dict = {}
+        for a in sub.answers.all():
+            if a.file_upload:
+                answers_dict[a.question_id] = f"{base_url}{a.file_upload.url}"
+            else:
+                answers_dict[a.question_id] = a.value
         
-        # Écriture des en-têtes
-        ws.append(headers)
+        for q in questions:
+            row.append(answers_dict.get(q.id, ""))
+        writer.writerow(row)
         
-        # Appliquer le style aux en-têtes
-        for cell in ws[1]:
-            cell.font = header_font
-            cell.fill = header_fill
-            cell.alignment = alignment
+    return response
 
-        # 2. RÉCUPÉRATION DES DONNÉES
-        submissions = Submission.objects.filter(survey=survey).prefetch_related('answers')
+export_survey_to_csv.short_description = "Exporter en CSV"
+def export_survey_to_excel(modeladmin, request, queryset):
+    survey = queryset.first()
+    if not survey:
+        return
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Réponses"
+    
+    # Style Shine Agency pour l'en-tête
+    header_font = Font(bold=True, color="FFFFFF")
+    header_fill = PatternFill(start_color="122046", end_color="122046", fill_type="solid")
+    center_align = Alignment(horizontal="center", vertical="center")
+    
+    questions = survey.questions.exclude(question_type__in=['Entete', 'section']).order_by('order')
+    headers = ['ID', 'Date', 'Enquêteur'] + [q.label for q in questions]
+    ws.append(headers)
+    
+    # Application des styles
+    for cell in ws[1]:
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = center_align
+
+    base_url = request.build_absolute_uri('/')[:-1]
+    submissions = Submission.objects.filter(survey=survey).prefetch_related('answers')
+    
+    for sub in submissions:
+        row = [
+            sub.id, 
+            sub.submitted_at.strftime("%d/%m/%Y %H:%M"), 
+            sub.enumerator.username if sub.enumerator else "Anonyme"
+        ]
         
-        for sub in submissions:
-            row = [
-                sub.id, 
-                sub.submitted_at.strftime("%d/%m/%Y %H:%M"), 
-                sub.enumerator.username if sub.enumerator else "Anonyme"
-            ]
-            
-            # On crée un dictionnaire {question_id: valeur} pour un accès rapide
-            answers_dict = {a.question_id: a.value for a in sub.answers.all()}
-            
-            for q in questions:
-                row.append(answers_dict.get(q.id, "")) # On ajoute la réponse ou vide
-            
-            ws.append(row)
+        answers_dict = {}
+        for a in sub.answers.all():
+            if a.file_upload:
+                answers_dict[a.question_id] = f"{base_url}{a.file_upload.url}"
+            else:
+                answers_dict[a.question_id] = a.value
+                
+        for q in questions:
+            row.append(answers_dict.get(q.id, ""))
+        ws.append(row)
 
-        # Ajuster la largeur des colonnes automatiquement
-        for col in ws.columns:
-            max_length = 0
-            column = col[0].column_letter
-            for cell in col:
-                try:
-                    if len(str(cell.value)) > max_length:
-                        max_length = len(str(cell.value))
-                except: pass
-            ws.column_dimensions[column].width = max_length + 2
+    # Ajustement automatique de la largeur des colonnes
+    for column_cells in ws.columns:
+        max_length = 0
+        column_letter = column_cells[0].column_letter
+        for cell in column_cells:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except: pass
+        ws.column_dimensions[column_letter].width = min(max_length + 2, 60)
 
-    # Préparation de la réponse HTTP
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    filename = f"export_{datetime.now().strftime('%Y%md_%H%M')}.xlsx"
+    filename = f"export_{survey.id}_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     
     wb.save(response)
@@ -200,14 +214,43 @@ class QuestionAdmin(SortableAdminMixin, admin.ModelAdmin):
         return obj.survey.title
     survey_name.short_description = "Formulaire"
 # Visualisation des réponses (Lecture seule pour la sécurité des données)
+# 1. Définir l'Inline à l'extérieur
 class AnswerInline(admin.TabularInline):
     model = Answer
-    readonly_fields = ('question', 'value')
+    fields = ('question', 'display_value')
+    readonly_fields = ('question', 'display_value')
     extra = 0
-    can_delete = False
+    can_delete = False # Sécurité : on ne supprime pas les réponses ici
 
+    def display_value(self, obj):
+        # Vérification si un fichier est présent
+        if obj.file_upload:
+            url = obj.file_upload.url
+            if obj.question.question_type == 'image':
+                # Miniature cliquable pour les images
+                return format_html(
+                    '<a href="{0}" target="_blank">'
+                    '<img src="{0}" style="width: 80px; height: auto; border-radius: 5px; border: 1px solid #ddd;"/>'
+                    '</a>', url
+                )
+            elif obj.question.question_type == 'audio':
+                # Lien avec icône pour l'audio
+                return format_html(
+                    '<a href="{}" target="_blank" style="font-weight:bold; color:#122046; text-decoration:none;">'
+                    '<i class="fas fa-play-circle"></i> 🎵 Écouter l\'audio'
+                    '</a>', url
+                )
+        
+        # Affichage du texte classique (text, select, checkbox)
+        return obj.value or "-"
+
+    display_value.short_description = "Réponse / Fichier"
+
+# 2. Enregistrer l'Admin de Soumission
 @admin.register(Submission)
 class SubmissionAdmin(admin.ModelAdmin):
     list_display = ('survey', 'enumerator', 'submitted_at')
+    list_filter = ('survey', 'submitted_at', 'enumerator') # Filtres utiles
     readonly_fields = ('survey', 'enumerator', 'submitted_at')
+    
     inlines = [AnswerInline]

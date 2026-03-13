@@ -24,11 +24,13 @@ class Survey(models.Model):
 class Question(models.Model):
     """Une question spécifique dans un formulaire"""
     TYPE_CHOICES = [
-        ('section', '---Titre de Section / Groupe---'),
+        ('Entete', '-- Titre illustratif(Regroupement)---'),
+        ('section', 'Nouvelle section (Changement de page)'),
         ('text', 'Texte court'),
         ('textarea', 'Paragraphe (Texte long)'),
         ('number', 'Nombre'),
-        ('select', 'Choix unique'),
+        ('select', 'Choix unique (Liste)'),
+        ('checkbox', 'Choix multiples (Cases)'), 
         ('date', 'Date'),
         ('image', 'Photo/Image'),
         ('audio', 'Enregistrement audio'),
@@ -40,6 +42,12 @@ class Question(models.Model):
     required = models.BooleanField(default=True)
     order = models.PositiveIntegerField(default=0, db_index=True) # Ajoute db_index pour la performance
     ##
+    help_text = models.TextField(
+        blank=True, 
+        null=True, 
+        verbose_name="Description / Aide",
+        help_text="Texte descriptif qui s'affiche sous le titre ou la question."
+    )
     # Si cette question dépend d'une autre :
     depends_on = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name="dependent_questions")
     # La valeur qui doit être répondue à "depends_on" pour afficher CETTE question

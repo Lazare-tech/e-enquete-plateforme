@@ -56,4 +56,19 @@ class DynamicSurveyForm(forms.Form):
                     label=label, required=required,
                     widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
                 )
+            elif question.question_type == 'image':
+                self.fields[field_key] = forms.ImageField(
+                    label=label, 
+                    required=required,
+                    widget=forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'image/*'})
+                )
+            
+            elif question.question_type == 'audio':
+                self.fields[field_key] = forms.FileField(
+                    label=label, 
+                    required=required,
+                    widget=forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'audio/*'})
+                )
+            elif question.question_type in ['Entete', 'section']:
+                continue
 #######################

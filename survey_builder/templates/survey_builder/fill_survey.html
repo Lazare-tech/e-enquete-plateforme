@@ -3,148 +3,296 @@
 
 {% block content %}
 <div class="container py-5" style="max-width: 900px;">
-    <div class="text-center mb-5">
-        <h1 class="fw-bold text-dark">{{ survey.title }}</h1>
-        <p class="text-muted mx-auto" style="max-width: 600px;">{{ survey.description }}</p>
-        <div class="progress mt-4" style="height: 6px; border-radius: 10px;">
-            <div id="surveyProgressBar" class="progress-bar bg-primary" role="progressbar" style="width: 0%;"></div>
+    <div class="sticky-top bg-f4f7f6 pt-2 pb-3" style="z-index: 1020;">
+        <div class="progress shadow-sm" style="height: 8px; border-radius: 10px;">
+            <div id="surveyProgressBar" class="progress-bar bg-primary progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;"></div>
         </div>
     </div>
 
-    <form method="post" enctype="multipart/form-data" id="survey-form" class="pb-5">
-        {% csrf_token %}
-        
-        {% for question in questions %} 
-            {% if question.question_type == 'section' %}
-                <div class="section-header mt-5 mb-4 animate__animated animate__fadeIn">
-                    <h5 class="fw-bold text-primary text-uppercase letter-spacing-1">
-                        <i class="fas fa-list-ul me-2"></i>{{ question.label }}
-                    </h5>
-                    <hr class="mt-2 opacity-10">
-                </div>
-            {% else %}
-                <div class="card shadow-sm border-0 mb-4 question-card animate__animated" 
-                     id="q-{{ question.id }}"
-                     data-depends-on="{{ question.depends_on.id|default:'' }}"
-                     data-depends-value="{{ question.dependency_value|default:'' }}"
-                     {% if question.depends_on %}style="display: none; opacity: 0;"{% endif %}>
-                    
-                    <div class="card-body p-4">
-                        <div class="d-flex align-items-center mb-3">
-                            <span class="badge bg-light text-primary rounded-circle me-2 p-2 shadow-sm" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">{{ forloop.counter }}</span>
-                            <label class="form-label fw-semibold mb-0 h6">
-                                {{ question.label }}
-                                {% if question.required %}<span class="text-danger">*</span>{% endif %}
-                            </label>
-                        </div>
-                        
-                        <div class="field-container">
-                            {% if question.question_type == 'text' %}
-                                <input type="text" name="question_{{ question.id }}" class="form-control custom-input" {% if question.required %}required{% endif %}>
-                            
-                            {% elif question.question_type == 'textarea' %}
-                                <textarea name="question_{{ question.id }}" class="form-control custom-input" rows="3" {% if question.required %}required{% endif %}></textarea>
+    <form method="post" enctype="multipart/form-data" id="survey-form" novalidate>
+    {% csrf_token %}
+    
+    <div id="survey-steps-container">
+        <div class="survey-step active-step" data-step="1">
+            <div class="section-banner mb-5 p-4 bg-white shadow-sm rounded-3 border-top border-primary border-5">
+                <h1 class="fw-bold text-dark">{{ survey.title }}</h1>
+                {% if survey.description %}
+                    <p class="text-muted mb-0">{{ survey.description }}</p>
+                {% endif %}
+            </div>
 
-                            {% elif question.question_type == 'number' %}
-                                <input type="number" name="question_{{ question.id }}" class="form-control custom-input" {% if question.required %}required{% endif %}>
+            {% for question in questions %}
+                
+                {% if question.question_type == 'Entete' %}
+                    <div class="group-header mt-5 mb-4 p-3 bg-white shadow-sm rounded-3 border-start border-primary border-4">
+                        <h5 class="fw-bold text-dark mb-1">{{ question.label }}</h5>
+                        {% if question.help_text %}
+                            <p class="text-muted small mb-0 opacity-75">{{ question.help_text }}</p>
+                        {% endif %}
+                    </div>
 
-                            {% elif question.question_type == 'select' %}
-                                <select name="question_{{ question.id }}" class="form-select custom-input dep-trigger" {% if question.required %}required{% endif %}>
-                                    <option value="">Sélectionnez une option</option>
-                                    {% for option in question.options.all %}
-                                        <option value="{{ option.value }}">{{ option.text }}</option>
-                                    {% endfor %}
-                                </select>
-
-                            {% elif question.question_type == 'date' %}
-                                <input type="date" name="question_{{ question.id }}" class="form-control custom-input" {% if question.required %}required{% endif %}>
-
-                            {% elif question.question_type == 'image' %}
-                                <div class="file-input-wrapper">
-                                    <input type="file" name="question_{{ question.id }}" accept="image/*" class="form-control" {% if question.required %}required{% endif %}>
-                                </div>
-
-                            {% elif question.question_type == 'audio' %}
-                                <div class="file-input-wrapper">
-                                    <input type="file" name="question_{{ question.id }}" accept="audio/*" capture="microphone" class="form-control" {% if question.required %}required{% endif %}>
-                                </div>
+                {% elif question.question_type == 'section' %}
+                    </div> <div class="survey-step" style="display: none;">
+                        <div class="section-banner mb-5 p-4 bg-white shadow-sm rounded-3 border-top border-primary border-5">
+                            <h2 class="fw-bold text-dark">{{ question.label }}</h2>
+                            {% if question.help_text %}
+                                <p class="text-muted mb-0">{{ question.help_text }}</p>
                             {% endif %}
                         </div>
-                    </div>
-                </div>
-            {% endif %}
-        {% endfor %}
 
-        <div class="d-grid gap-2 mt-5">
-            <button type="submit" class="btn btn-primary btn-lg py-3 rounded-3 shadow-lg border-0">
-                <i class="fas fa-paper-plane me-2"></i> Envoyer le rapport
-            </button>
+                {% else %}
+                    <div class="card shadow-sm border-0 mb-4 question-card animate__animated" 
+                         id="q-{{ question.id }}"
+                         data-depends-on="{{ question.depends_on.id|default:'' }}"
+                         data-depends-value="{{ question.dependency_value|default:'' }}">
+                        
+                        <div class="card-body p-4">
+                            <label class="form-label fw-bold h6 mb-1">
+                                {{ question.label }} {% if question.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+
+                            {% if question.help_text %}
+                                <p class="small text-muted mb-3 italic">{{ question.help_text }}</p>
+                            {% endif %}
+
+                            <div class="input-wrapper">
+                                {% if question.question_type == 'text' %}
+                                    <input type="text" name="question_{{ question.id }}" class="form-control custom-input" {% if question.required %}required{% endif %}>
+                                
+                                {% elif question.question_type == 'textarea' %}
+                                    <textarea name="question_{{ question.id }}" class="form-control custom-input" rows="4" {% if question.required %}required{% endif %} placeholder="Votre réponse..."></textarea>
+
+                                {% elif question.question_type == 'number' %}
+                                    <input type="number" name="question_{{ question.id }}" class="form-control custom-input" {% if question.required %}required{% endif %}>
+
+                               {% elif question.question_type == 'select' %}
+    <select name="question_{{ question.id }}" class="form-select custom-input" {% if question.required %}required{% endif %}>
+        <option value="">Sélectionnez une option...</option>
+        {% for option in question.options.all %}
+            <option value="{{ option.value }}">{{ option.text }}</option>
+        {% endfor %}
+    </select>
+
+{% elif question.question_type == 'checkbox' %}
+    <div class="options-container mt-2">
+        {% for option in question.options.all %}
+            <div class="form-check custom-checkbox mb-2">
+                <input class="form-check-input" type="checkbox" 
+                       name="question_{{ question.id }}" 
+                       id="opt-{{ option.id }}" 
+                       value="{{ option.value }}">
+                <label class="form-check-label ms-2" for="opt-{{ option.id }}">
+                    {{ option.text }}
+                </label>
+            </div>
+        {% endfor %}
         </div>
-    </form>
+
+                                {% elif question.question_type == 'date' %}
+                                    <input type="date" name="question_{{ question.id }}" class="form-control custom-input" {% if question.required %}required{% endif %}>
+                                    {% elif question.question_type == 'image' %}
+    <div class="d-flex align-items-center bg-light p-3 rounded-3 border border-dashed">
+        <i class="fas fa-camera text-primary me-3 fa-lg"></i>
+        <input type="file" name="question_{{ question.id }}" accept="image/*" capture="environment" class="form-control border-0 bg-transparent shadow-none" {% if question.required %}required{% endif %}>
+    </div>
+    <p class="text-muted small mt-2"><i class="fas fa-info-circle me-1"></i> Cliquez pour prendre une photo ou choisir un fichier.</p>
+
+                                {% elif question.question_type == 'audio' %}
+                                    <div class="d-flex align-items-center bg-light p-3 rounded-3 border border-dashed">
+                                        <i class="fas fa-microphone text-primary me-3 fa-lg"></i>
+                                        <input type="file" name="question_{{ question.id }}" accept="audio/*" capture="microphone" class="form-control border-0 bg-transparent shadow-none" {% if question.required %}required{% endif %}>
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="invalid-feedback text-danger fw-medium small mt-2" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i> Ce champ est obligatoire.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div> 
+    </div>
+
+    <div class="d-flex justify-content-between mt-5 p-3 bg-white shadow rounded-pill sticky-bottom mx-auto" style="max-width: 600px; border: 1px solid #eee;">
+        <button type="button" id="prevBtn" class="btn btn-light rounded-pill px-4 fw-bold">Précédent</button>
+        <div class="align-self-center text-primary fw-bold">Page <span id="step-index">1</span></div>
+        <button type="button" id="nextBtn" class="btn btn-primary rounded-pill px-5 fw-bold shadow">Suivant</button>
+        <button type="submit" id="submitBtn" class="btn btn-success rounded-pill px-5 fw-bold shadow" style="display: none;">Soumettre</button>
+    </div>
+</form>
 </div>
 
 <style>
     :root { --shine-blue: #122046; }
     body { background-color: #f4f7f6; font-family: 'Inter', sans-serif; }
-    .question-card { border-radius: 15px; border-left: 0; transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); }
-    .question-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important; }
-    .custom-input { border: 2px solid #edf2f7; padding: 12px; border-radius: 10px; transition: all 0.3s; }
-    .custom-input:focus { border-color: var(--shine-blue); box-shadow: none; background-color: #fff; }
-    .progress-bar { transition: width 0.6s ease; }
-    .animate__fadeIn { animation: fadeIn 0.5s both; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .bg-f4f7f6 { background-color: #f4f7f6; }
+    
+    .section-banner { border-top: 6px solid var(--shine-blue) !important; border-radius: 8px; }
+    
+    .question-card { border-radius: 12px; transition: transform 0.2s ease; border: 1px solid #eef2f7; }
+    .custom-input { border: 2px solid #e2e8f0; border-radius: 8px; padding: 12px 15px; background-color: #fff; }
+    .custom-input:focus { border-color: var(--shine-blue); box-shadow: 0 0 0 0.2rem rgba(18, 32, 70, 0.1); }
+    
+    .custom-radio { 
+        padding: 12px 15px; 
+        border: 2px solid #f1f5f9; 
+        border-radius: 8px; 
+        transition: 0.2s; 
+        cursor: pointer;
+        background: white;
+    }
+    .custom-radio:hover { background-color: #f8fafc; border-color: var(--shine-blue); }
+    .form-check-input:checked + .form-check-label { font-weight: bold; color: var(--shine-blue); }
+    
+    .is-invalid { border-color: #ef4444 !important; background-color: #fffafa; }
+    .sticky-bottom { bottom: 30px; z-index: 1000; }
+    
+    .italic { font-style: italic; opacity: 0.8; }
 </style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const steps = document.querySelectorAll('.survey-step');
     const form = document.getElementById('survey-form');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const stepDisplay = document.getElementById('step-index');
     const progressBar = document.getElementById('surveyProgressBar');
+    let currentStep = 0;
 
-    function updateSurveyProgress() {
-        const total = document.querySelectorAll('.question-card:not([style*="display: none"])').length;
-        const filled = Array.from(document.querySelectorAll('.question-card:not([style*="display: none"]) input, .question-card:not([style*="display: none"]) select'))
-                            .filter(i => i.value !== "").length;
-        const percent = (filled / total) * 100;
-        progressBar.style.width = percent + '%';
-    }
+    // --- 1. LOGIQUE DE SAUT (SKIP LOGIC) ---
+    function applySkipLogic() {
+        const questions = document.querySelectorAll('.question-card');
+        
+        questions.forEach(card => {
+            const dependsOnId = card.getAttribute('data-depends-on');
+            const dependsValue = card.getAttribute('data-depends-value');
 
-    function checkLogic() {
-        const cards = document.querySelectorAll('.question-card');
-        cards.forEach(card => {
-            const parentId = card.dataset.dependsOn;
-            const targetValue = card.dataset.dependsValue;
+            if (dependsOnId) {
+                // On cherche la valeur de la question parente
+                const parentInputs = document.querySelectorAll(`[name="question_${dependsOnId}"]`);
+                let parentValue = "";
 
-            if (parentId) {
-                const parentField = form.querySelector(`[name="question_${parentId}"]`);
-                if (parentField) {
-                    // Vérification stricte et insensible aux espaces
-                    const isMatch = parentField.value.trim() === targetValue.trim();
-                    
-                    if (isMatch) {
-                        if (card.style.display === 'none') {
-                            card.style.display = 'block';
-                            card.classList.add('animate__fadeIn');
-                            card.querySelectorAll('input, select, textarea').forEach(i => i.disabled = false);
-                        }
-                    } else {
-                        card.style.display = 'none';
-                        card.classList.remove('animate__fadeIn');
-                        const input = card.querySelector('input, select, textarea');
-                        if (input) {
-                            input.disabled = true;
-                            input.value = ''; // On vide pour la cohérence des données
-                        }
+                if (parentInputs.length > 0) {
+                    if (parentInputs[0].type === 'radio') {
+                        const checkedRadio = document.querySelector(`[name="question_${dependsOnId}"]:checked`);
+                        parentValue = checkedRadio ? checkedRadio.value : "";
+                    } else if (parentInputs[0].tagName === 'SELECT') {
+                        parentValue = parentInputs[0].value;
+                    } else if (parentInputs[0].type === 'checkbox') {
+                        // Pour les checkbox, on vérifie si la valeur attendue est dans la liste des cochés
+                        const checkedBoxes = Array.from(document.querySelectorAll(`[name="question_${dependsOnId}"]:checked`)).map(cb => cb.value);
+                        parentValue = checkedBoxes.includes(dependsValue) ? dependsValue : "";
                     }
+                }
+
+                // Comparaison et Affichage/Masquage
+                if (String(parentValue) === String(dependsValue)) {
+                    card.style.display = 'block';
+                    // On remet le required si la question est affichée
+                    card.querySelectorAll('.custom-input, .form-check-input').forEach(input => {
+                        if (input.hasAttribute('data-is-required')) input.required = true;
+                    });
+                } else {
+                    card.style.display = 'none';
+                    // On enlève le required pour ne pas bloquer la validation si caché
+                    card.querySelectorAll('[required]').forEach(input => {
+                        input.setAttribute('data-is-required', 'true');
+                        input.required = false;
+                        input.classList.remove('is-invalid');
+                    });
                 }
             }
         });
-        updateSurveyProgress();
     }
 
-    // "input" est plus rapide que "change" pour les champs texte
-    form.addEventListener('input', checkLogic);
-    
+    // --- 2. GESTION DE LA NAVIGATION ---
+    function updateProgressBar() {
+        let progress = ((currentStep + 1) / steps.length) * 100;
+        if (progressBar) progressBar.style.width = progress + '%';
+    }
+
+    function showStep(n) {
+        steps.forEach((step, i) => {
+            step.style.display = (i === n) ? 'block' : 'none';
+        });
+        
+        prevBtn.style.visibility = (n === 0) ? 'hidden' : 'visible';
+        stepDisplay.innerText = `${n + 1} / ${steps.length}`;
+        
+        if (n === steps.length - 1) {
+            nextBtn.style.display = 'none';
+            submitBtn.style.display = 'block';
+        } else {
+            nextBtn.style.display = 'block';
+            submitBtn.style.display = 'none';
+        }
+        updateProgressBar();
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function validateStep() {
+        let valid = true;
+        const currentInputs = steps[currentStep].querySelectorAll('[required]');
+        
+        currentInputs.forEach(input => {
+            const card = input.closest('.question-card');
+            // On ne valide que si la question est visible
+            if (card && card.style.display !== 'none') {
+                let isFieldEmpty = false;
+                
+                if (input.type === 'checkbox' || input.type === 'radio') {
+                    const name = input.getAttribute('name');
+                    const checked = steps[currentStep].querySelector(`input[name="${name}"]:checked`);
+                    if (!checked) isFieldEmpty = true;
+                } else if (!input.value.trim()) {
+                    isFieldEmpty = true;
+                }
+
+                if (isFieldEmpty) {
+                    input.classList.add('is-invalid');
+                    const error = card.querySelector('.invalid-feedback');
+                    if (error) error.style.display = 'block';
+                    valid = false;
+                }
+            }
+        });
+        return valid;
+    }
+
+    // --- 3. ÉVÉNEMENTS ---
+    form.addEventListener('change', applySkipLogic);
+
+    nextBtn.addEventListener('click', () => {
+        if (validateStep()) {
+            currentStep++;
+            showStep(currentStep);
+        }
+    });
+
+    prevBtn.addEventListener('click', () => {
+        currentStep--;
+        showStep(currentStep);
+    });
+
+    // Nettoyage des erreurs au clic/saisie
+    document.querySelectorAll('input, textarea, select').forEach(input => {
+        input.addEventListener('input', function() {
+            this.classList.remove('is-invalid');
+            const card = this.closest('.question-card');
+            if (card) {
+                const error = card.querySelector('.invalid-feedback');
+                if (error) error.style.display = 'none';
+            }
+        });
+    });
+
     // Initialisation
-    checkLogic();
+    applySkipLogic();
+    showStep(currentStep);
 });
 </script>
 {% endblock content %}

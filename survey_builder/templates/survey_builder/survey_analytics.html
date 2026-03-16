@@ -1,0 +1,98 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    .analytics-main-wrapper { background: #f0f2f5; padding: 20px; font-family: 'Roboto', sans-serif; }
+    .header-card-google { border-top: 8px solid #122046 !important; border-radius: 8px; margin-bottom: 24px; }
+    .stat-card { background: white; border-radius: 8px; border: 1px solid #dadce0; padding: 24px; margin-bottom: 20px; }
+    .response-badge { background: #e8f0fe; color: #1967d2; border-radius: 20px; padding: 4px 12px; font-size: 13px; }
+</style>
+
+<div class="analytics-main-wrapper">
+    <div class="card stat-card header-card-google shadow-sm">
+        <h1 class="h2 fw-normal mb-3">{{ survey.title }}</h1>
+        <div class="d-flex align-items-center border-top pt-3">
+            <span class="response-badge">{{ total }} réponse{{ total|pluralize }}</span>
+            <small class="ms-3 text-muted">Résumé analytique - Shine Agency</small>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for stat in all_stats %}
+        <div class="col-12 mb-4">
+            <div class="stat-card shadow-sm">
+                <h3 style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">{{ stat.label }}</h3>
+                <p style="color: #70757a; font-size: 14px; margin-bottom: 20px;">{{ total }} réponses</p>
+
+               {% if stat.display_type == 'paragraph' %}
+        <div class="scroll-container" style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
+            {% for comment in stat.data %}
+                <div style="padding: 15px; background: #fff; border: 1px solid #dadce0; border-radius: 8px; margin-bottom: 12px; font-size: 14px; line-height: 1.5; color: #202124;">
+                    {{ comment|linebreaksbr }}
+                </div>
+            {% empty %}
+                <p class="text-muted">Aucune réponse enregistrée.</p>
+            {% endfor %}
+        </div>
+
+                {% elif stat.display_type == 'text' %}
+        <div class="scroll-container" style="max-height: 300px; overflow-y: auto; background: #f8f9fa; border-radius: 8px; border: 1px solid #eee;">
+            {% for text in stat.data %}
+                <div style="padding: 12px 16px; border-bottom: 1px solid #eef0f2; font-size: 14px; color: #3c4043;">
+                    <i class="fas fa-user-circle me-2 text-muted"></i> {{ text }}
+                </div>
+            {% empty %}
+                <div style="padding: 12px; color: #70757a;">Aucune donnée.</div>
+            {% endfor %}
+        </div>
+
+                {% else %}
+                    <div style="height: 350px; position: relative;">
+                        <canvas id="chart-{{ forloop.counter0 }}"></canvas>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const googleColors = ['#4285F4', '#DB4437', '#F4B400', '#0F9D58', '#AB47BC', '#00ACC1'];
+
+    {% for stat in all_stats %}
+    {% if stat.display_type == 'pie' or stat.display_type == 'bar' %}
+    new Chart(document.getElementById('chart-{{ forloop.counter0 }}'), {
+        type: '{% if stat.display_type == "pie" %}pie{% else %}bar{% endif %}',
+        data: {
+            labels: [{% for item in stat.data %}"{{ item.answer_value|safe }}",{% endfor %}],
+            datasets: [{
+                data: [{% for item in stat.data %}{{ item.count }},{% endfor %}],
+                backgroundColor: {% if stat.display_type == 'pie' %}googleColors{% else %}'#4285F4'{% endif %},
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: '{% if stat.display_type == "bar" %}y{% else %}x{% endif %}',
+            plugins: {
+                legend: { 
+                    display: {% if stat.display_type == 'pie' %}true{% else %}false{% endif %},
+                    position: 'right' 
+                }
+            },
+            scales: {
+                x: { display: {% if stat.display_type == "bar" %}true{% else %}false{% endif %}, beginAtZero: true },
+                y: { display: {% if stat.display_type == "bar" %}true{% else %}false{% endif %} }
+            }
+        }
+    });
+    {% endif %}
+    {% endfor %}
+});
+</script>
+{% endblock %}

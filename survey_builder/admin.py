@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.urls import path
 import csv
 import openpyxl
 from openpyxl.styles import Font, Alignment, PatternFill
@@ -6,9 +7,12 @@ from django.http import HttpResponse
 from datetime import datetime
 # Register your models here.
 from django.contrib import admin
+
+from survey_builder.views import survey_analytics
 from .models import Survey, Question, Option, Submission, Answer
 from adminsortable2.admin import SortableAdminMixin, SortableTabularInline
 from django.utils.html import format_html
+
 from django.urls import reverse
 # 1. Permet d'ajouter des options directement sous la question
 class OptionInline(SortableTabularInline):
@@ -149,12 +153,25 @@ def export_survey_to_excel(modeladmin, request, queryset):
 export_survey_to_excel.short_description = "Exporter en Excel (.xlsx)"
 @admin.register(Survey)
 class SurveyAdmin(admin.ModelAdmin):
-    list_display = ('title','share_link', 'created_by', 'is_active', 'created_at')
+    list_display = ('title','view_analytics_link','share_link', 'created_by', 'is_active', 'created_at')
     list_filter = ('is_active', 'created_at')
     search_fields = ('title',)
     actions = [export_survey_to_csv, export_survey_to_excel] # Ajout de l'action ici
     inlines = [QuestionInline] # On injecte les questions dans le formulaire Survey
     #
+    def view_analytics_link(self, obj):
+        url = reverse('survey_analytics', args=[obj.id])
+        return format_html('<a class="button" href="{}" style="background:#4285F4; color:white;">Analyser</a>', url)
+
+    view_analytics_link.short_description = "Analyses"
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('<int:survey_id>/analytics/', self.admin_site.admin_view(survey_analytics), name='admin_survey_analytics'),
+        ]
+        return custom_urls + urls
+      ##
     def share_link(self, obj):
         # On construit l'URL complète
         url = reverse('survey_builder:fill', kwargs={'uid': obj.uid})

@@ -1,10 +1,12 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 # Create your views here.
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Survey, Submission, Answer
 from .forms import DynamicSurveyForm
-
+from django.db.models import Count
+import json
 #########################
 @login_required # Force la connexion pour savoir qui remplit le formulaire
 def fill_survey(request, uid):
@@ -70,3 +72,74 @@ def survey_success(request):
     return render(request, 'survey_builder/success.html')
 #############
 
+@staff_member_required
+def survey_analytics(request, survey_id):
+    survey = get_object_or_404(Survey, id=survey_id)
+    submissions = Submission.objects.filter(survey=survey)
+    total = submissions.count()
+    
+    # On récupère toutes les questions valides
+    questions = survey.questions.exclude(question_type__in=['Entete', 'section']).order_by('order')
+    
+    all_stats = []
+    
+    for q in questions:
+        # On récupère toutes les réponses pour cette question
+        answers_qs = Answer.objects.filter(question=q).values_list('value', flat=True)
+        answers = [a for a in answers_qs if a] # On filtre les vides
+        
+        if not answers:
+            continue
+
+        # --- LOGIQUE DE DÉTECTION ---
+        display_type = 'pie'
+        data = []
+        
+        # 1. CAS : CASES À COCHER (Stockées souvent en "val1, val2")
+        if q.question_type == 'checkbox':
+            display_type = 'bar'
+            data_counts = {}
+            for a in answers:
+                # On split si c'est une chaîne séparée par des virgules
+                parts = [p.strip() for p in a.split(',')]
+                for choice in parts:
+                    data_counts[choice] = data_counts.get(choice, 0) + 1
+            data = [{'answer_value': k, 'count': v} for k, v in data_counts.items()]
+
+        else:
+            total_chars = sum(len(str(a)) for a in answers)
+            avg_length = total_chars / len(answers) if answers else 0
+            unique_count = len(set(answers))
+
+            # 2. CAS : PARAGRAPHES (Textes longs)
+            if q.question_type == 'textarea' or avg_length > 60:
+                display_type = 'paragraph'
+                data = answers[:15] # On limite à 15 pour l'affichage
+
+            # 3. CAS : RÉPONSES COURTES (Identifiants uniques)
+            elif unique_count > (total * 0.8) and total > 3:
+                display_type = 'text'
+                data = answers[:10]
+            #TEXT COURT
+            elif unique_count > (total * 0.7) and total > 2:
+                display_type = 'text'
+                data = answers # Liste brute
+            # 4. CAS : CHOIX UNIQUES (Select / Radio)
+            else:
+                display_type = 'pie'
+                data_counts = {}
+                for a in answers:
+                    data_counts[a] = data_counts.get(a, 0) + 1
+                data = [{'answer_value': k, 'count': v} for k, v in data_counts.items()]
+
+        all_stats.append({
+            'label': q.label,
+            'display_type': display_type,
+            'data': data
+        })
+
+    return render(request, 'survey_builder/survey_analytics.html', {
+        'all_stats': all_stats, 
+        'survey': survey, 
+        'total': total
+    })

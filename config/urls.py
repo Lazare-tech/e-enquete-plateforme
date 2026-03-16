@@ -18,9 +18,12 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf.urls.static import static
 from django.conf import settings
+import survey_builder.views
 #
 handler404 = 'statapp.views.error_404_view'
 urlpatterns = [
+        path('admin/survey-analytics/<int:survey_id>/', survey_builder.views.survey_analytics, name='survey_analytics'),
+
     path("admin/", admin.site.urls),
     path("", include("statapp.urls",namespace="statapp")),
     path('survey/', include("survey_builder.urls", namespace="survey")),

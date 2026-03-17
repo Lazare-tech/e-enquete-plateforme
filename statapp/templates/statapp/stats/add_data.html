@@ -4,10 +4,11 @@
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
+        <div id="ajax-message-container" class="mb-3" style="display: none;"></div>
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
                 <div class="card-header bg-white border-0 pt-4 px-4 text-center">
                     <h3 class="fw-bold text-primary mb-0">Ajouter des données</h3>
-                    <p class="text-muted small">Portail collaboratif d'agence</p>
+                    <p class="text-muted">Choisissez le type de contenu à publier.</p>
                 </div>
                 
                 <div class="card-body p-4">
@@ -26,7 +27,7 @@
 
                     <div class="tab-content">
                         <div class="tab-pane fade show active" id="fileFormTab">
-                            <form method="post" enctype="multipart/form-data" novalidate>
+                            <form method="post" enctype="multipart/form-data" id="ajax-file-form" novalidate>
                                 {% csrf_token %}
                                 
                                 <div class="mb-4 p-3 bg-light rounded-3 border-start border-primary border-4">
@@ -41,14 +42,18 @@
                                 </div>
 
                                 {{ file_form.as_p }}
-                                <button type="submit" name="submit_file" id="btn-submit-file" class="btn btn-primary w-100 py-3 mt-2">
+                                {% comment %} <button type="submit" name="submit_file" id="btn-submit-file" class="btn btn-primary w-100 py-3 mt-2">
                                     <i class="fas fa-cloud-upload-alt me-2"></i>Enregistrer le fichier
+                                </button> {% endcomment %}
+                                <button type="submit" name="submit_file" class="btn btn-primary w-100 py-3 mt-2">
+                                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                                    <span class="btn-text"><i class="fas fa-cloud-upload-alt me-2"></i>Enregistrer le fichier</span>
                                 </button>
                             </form>
                         </div>
 
                         <div class="tab-pane fade" id="varFormTab">
-                            <form method="post">
+                            <form method="post" id="ajax-var-form" novalidate>
                                 {% csrf_token %}
 
                                 <div class="mb-4 p-3 bg-light rounded-3 border-start border-success border-4">
@@ -63,8 +68,12 @@
                                 </div>
 
                                 {{ var_form.as_p }}
-                                <button type="submit" name="submit_var" id="btn-submit-var" class="btn btn-success w-100 py-3 mt-2">
+                                {% comment %} <button type="submit" name="submit_var" id="btn-submit-var" class="btn btn-success w-100 py-3 mt-2">
                                     <i class="fas fa-check-circle me-2"></i>Enregistrer la variable
+                                </button> {% endcomment %}
+                                <button type="submit" name="submit_var" class="btn btn-success w-100 py-3 mt-3">
+                                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                                    <span class="btn-text"><i class="fas fa-check-circle me-2"></i>Enregistrer la variable</span>
                                 </button>
                             </form>
                         </div>
@@ -74,4 +83,120 @@
         </div>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    const handleFormSubmit = (formId, submitName) => {
+        const form = document.getElementById(formId);
+        if (!form) return;
+
+        const btn = form.querySelector('button[type="submit"]');
+        const spinner = btn.querySelector('.spinner-border');
+        const btnText = btn.querySelector('.btn-text');
+        const messageContainer = document.getElementById('ajax-message-container');
+
+        // Supprimer l'erreur dès qu'on tape
+        const clearError = (input) => {
+            input.classList.remove('is-invalid');
+            const errorMsg = input.parentNode.querySelector('.invalid-feedback-manual');
+            if (errorMsg) errorMsg.remove();
+        };
+
+        form.querySelectorAll('input, textarea, select').forEach(element => {
+            element.addEventListener('input', () => clearError(element));
+            element.addEventListener('change', () => clearError(element));
+        });
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let isFormValid = true;
+            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+            form.querySelectorAll('.invalid-feedback-manual').forEach(el => el.remove());
+
+            // 1. Validation de la catégorie
+            const catSelect = form.querySelector('select[name="category"]');
+            const newCatInput = form.querySelector('input[name*="category_title"]');
+            
+            if (catSelect && !catSelect.value && (!newCatInput || !newCatInput.value.trim())) {
+                showFieldError(catSelect, "Veuillez choisir une catégorie ou en créer une.");
+                isFormValid = false;
+            }
+
+            // 2. Validation des autres champs
+            const fieldsToValidate = form.querySelectorAll('input[name="title"], input[name="label"], input[name="file"], input[name="value"]');
+            fieldsToValidate.forEach(field => {
+                if (field.type !== 'file' && !field.value.trim()) {
+                    showFieldError(field, "Ce champ est obligatoire.");
+                    isFormValid = false;
+                } else if (field.type === 'file' && !field.files.length) {
+                    showFieldError(field, "Veuillez sélectionner un fichier.");
+                    isFormValid = false;
+                }
+            });
+
+            if (!isFormValid) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+
+            // --- DÉBUT DE L'ENVOI RÉEL ---
+            btn.disabled = true;
+            spinner.classList.remove('d-none');
+            btnText.style.opacity = "0.5";
+
+            const formData = new FormData(form);
+            formData.append(submitName, 'true');
+
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Erreur serveur');
+                return response.json();
+            })
+            .then(data => {
+                messageContainer.style.display = "block";
+                if (data.status === 'success') {
+                    messageContainer.innerHTML = `<div class="alert alert-success alert-dismissible fade show">
+                        <i class="fas fa-check-circle me-2"></i>${data.message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>`;
+                    form.reset();
+                    // On vide aussi les messages HTMX
+                    const statusDiv = form.querySelector('[id*="-status"]');
+                    if (statusDiv) statusDiv.innerHTML = "";
+                } else {
+                    messageContainer.innerHTML = `<div class="alert alert-danger">${data.message || 'Erreur de validation'}</div>`;
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                messageContainer.style.display = "block";
+                messageContainer.innerHTML = `<div class="alert alert-danger">Erreur de connexion au serveur.</div>`;
+            })
+            .finally(() => {
+                // ARRÊT DU SPINNER
+                btn.disabled = false;
+                spinner.classList.add('d-none');
+                btnText.style.opacity = "1";
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+    };
+
+    function showFieldError(input, message) {
+        input.classList.add('is-invalid');
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'invalid-feedback-manual text-danger small mt-1 fw-bold';
+        errorDiv.innerHTML = `<i class="fas fa-exclamation-circle me-1"></i> ${message}`;
+        input.parentNode.appendChild(errorDiv);
+    }
+
+    handleFormSubmit('ajax-file-form', 'submit_file');
+    handleFormSubmit('ajax-var-form', 'submit_var');
+});
+</script>
 {% endblock content %}

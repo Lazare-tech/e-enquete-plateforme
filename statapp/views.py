@@ -12,7 +12,8 @@ from .models import Category, StatFile,UserFileAccess,FAQ, VariableCategory
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import StatFileForm, StatVariableForm
-
+from django.http import JsonResponse
+from django.db import transaction
 # Create your views here.
 def homepage(request):
     # On récupère les fichiers actifs, triés par date (géré par Meta dans le modèle)
@@ -171,54 +172,60 @@ def add_data_view(request):
 
             if form_is_ok:
                 try:
-                    stat_file = file_form.save(commit=False)
-                    stat_file.created_by = request.user
-                    if new_file_cat_title:
-                        # On crée la catégorie sans 'is_active'
-                        cat, _ = Category.objects.get_or_create(
-                            title__iexact=new_file_cat_title,
-                            defaults={'title': new_file_cat_title}
-                        )
-                        stat_file.category = cat
-                    else:
-                        stat_file.category = file_form.cleaned_data.get('category')
+                    with transaction.atomic():
+                        stat_file = file_form.save(commit=False)
+                        stat_file.created_by = request.user
+                        if new_file_cat_title:
+                            # On crée la catégorie sans 'is_active'
+                            cat, _ = Category.objects.get_or_create(
+                                title__iexact=new_file_cat_title,
+                                defaults={'title': new_file_cat_title}
+                            )
+                            stat_file.category = cat
+                        else:
+                            stat_file.category = file_form.cleaned_data.get('category')
 
-                    # Sécurité : Si aucune catégorie n'est trouvée (ni nouvelle, ni sélectionnée)
-                    if not stat_file.category:
-                        messages.error(request, "Veuillez indiquer une catégorie.")
-                    else:
-                        stat_file.save()
-                        messages.success(request, "Fichier ajouté avec succès !")
-                        return redirect('statapp:search')
+                        # Sécurité : Si aucune catégorie n'est trouvée (ni nouvelle, ni sélectionnée)
+                        if not stat_file.category:
+                            return JsonResponse({'status': 'error', 'message': 'Veuillez indiquer une catégorie.'}, status=400)
+                        else:
+                            stat_file.save()
+                            return JsonResponse({'status': 'success', 'message': 'Fichier ajouté avec succès !'})
+                            return redirect('statapp:search')
                 except Exception as e:
-                    messages.error(request, f"Erreur lors de l'enregistrement : {e}")
+                    return JsonResponse({'status': 'error', 'message': f"Erreur : {str(e)}"}, status=500)
             else:
                 # Si le formulaire échoue, on affiche pourquoi (ex: fichier manquant)
-                messages.error(request, f"Le formulaire est invalide : {file_form.errors}")
+                return JsonResponse({'status': 'error', 'message': 'Formulaire invalide.', 'errors': file_form.errors}, status=400)
 
         # --- CAS 2 : VARIABLE ---
         elif 'submit_var' in request.POST:
             # Ta logique de variable qui fonctionne déjà...
             if var_form.is_valid() or (request.POST.get('new_category_title') and 'category' in var_form.errors):
-                variable = var_form.save(commit=False)
-                new_title = request.POST.get('new_category_title', '').strip()
-                if new_title:
-                    cat, _ = VariableCategory.objects.get_or_create(
-                        title__iexact=new_title, defaults={'title': new_title, 'is_active': False}
-                    )
-                    variable.category = cat
-                else:
-                    variable.category = var_form.cleaned_data.get('category')
-                
-                variable.created_by = request.user
-                variable.save()
-                messages.success(request, "Variable ajoutée avec succès.")
-                return redirect('statapp:homepage')
+                try:
+                    with transaction.atomic():
+                        variable = var_form.save(commit=False)
+                        new_title = request.POST.get('new_category_title', '').strip()
+                        if new_title:
+                            cat, _ = VariableCategory.objects.get_or_create(
+                                title__iexact=new_title, defaults={'title': new_title, 'is_active': False}
+                            )
+                            variable.category = cat
+                        else:
+                            variable.category = var_form.cleaned_data.get('category')
+                        
+                        variable.created_by = request.user
+                        variable.save()
+                        return JsonResponse({'status': 'success', 'message': 'Variable enregistrée avec succès.'})
+                except Exception as e:
+                    return JsonResponse({'status': 'error', 'message': f"Erreur : {str(e)}"}, status=500)
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Formulaire invalide.', 'errors': var_form.errors}, status=400)
 
     return render(request, 'statapp/stats/add_data.html', {'file_form': file_form, 'var_form': var_form})
 #########################################################################################
 class UserLoginView(LoginView):
-    template_name = 'registration/login.html'
+    template_name = 'statapp/registration/login.html'
     redirect_authenticated_user = True  # Redirige si déjà connecté
     
     def get_success_url(self):
@@ -226,7 +233,7 @@ class UserLoginView(LoginView):
 
 class UserRegisterView(CreateView):
     form_class = CleanRegisterForm
-    template_name = 'registration/register.html'
+    template_name = 'statapp/registration/register.html'
     success_url = reverse_lazy('statapp:login') # Redirige vers connexion après succès
 
     def form_valid(self, form):

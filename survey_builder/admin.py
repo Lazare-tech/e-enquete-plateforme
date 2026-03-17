@@ -160,7 +160,7 @@ class SurveyAdmin(admin.ModelAdmin):
     inlines = [QuestionInline] # On injecte les questions dans le formulaire Survey
     #
     def view_analytics_link(self, obj):
-        url = reverse('survey_analytics', args=[obj.id])
+        url = reverse('survey_analytics', args=[obj.uid])
         return format_html('<a class="button" href="{}" style="background:#4285F4; color:white;">Analyser</a>', url)
 
     view_analytics_link.short_description = "Analyses"
@@ -168,7 +168,7 @@ class SurveyAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
-            path('<int:survey_id>/analytics/', self.admin_site.admin_view(survey_analytics), name='admin_survey_analytics'),
+            path('<uuid:uid>/analytics/', self.admin_site.admin_view(survey_analytics), name='admin_survey_analytics'),
         ]
         return custom_urls + urls
       ##

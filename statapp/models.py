@@ -89,15 +89,24 @@ class VariableCategory(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        status = "✅" if self.is_active else "⏳"
-        return f"{status} {self.title}"
+        # On définit une valeur de base (ton titre)
+        label = self.title if self.title else "Sans titre"
+        
+        # On peut ajouter un indicateur visuel si ce n'est pas encore validé
+        if not self.is_active:
+            return f"{label} (En attente de validation)"
     
+        return label
 class StatVariable(models.Model):
     category = models.ForeignKey(VariableCategory, on_delete=models.CASCADE, related_name="variables")
     label = models.CharField(max_length=255, verbose_name="Nom de la variable")
     value = models.CharField(max_length=255, verbose_name="Valeur / Information")
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Ajouté par")
+    ##
+    class Meta:
+        verbose_name = "Variable Statistique"
+        verbose_name_plural = "Variables Statistiques"
 
     def __title__(self):
         return f"{self.label} : {self.value}"

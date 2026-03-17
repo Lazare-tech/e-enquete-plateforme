@@ -11,9 +11,10 @@
             <a href="{% url 'survey:list' %}" class="btn btn-outline-secondary px-4 py-2">
                 Retour à la liste
             </a>
-            <button onclick="window.history.back()" class="btn btn-primary px-4 py-2">
-                Nouvelle saisie
-            </button>
+           
+            <a href="{% url 'survey_builder:fill' survey.uid %}" class="btn btn-primary px-4 py-2">
+        Nouvelle saisie
+    </a>
         </div>
     </div>
 </div>

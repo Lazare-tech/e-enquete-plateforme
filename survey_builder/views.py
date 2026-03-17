@@ -7,6 +7,8 @@ from .models import Survey, Submission, Answer
 from .forms import DynamicSurveyForm
 from django.db.models import Count
 import json
+from django.db import transaction # 
+
 #########################
 @login_required # Force la connexion pour savoir qui remplit le formulaire
 def fill_survey(request, uid):
@@ -18,43 +20,48 @@ def fill_survey(request, uid):
         form = DynamicSurveyForm(survey, request.POST, request.FILES) 
         
         if form.is_valid():
-            submission = Submission.objects.create(survey=survey, enumerator=request.user)
-            
-            for q in questions:
-                # Ignorer les types qui ne sont pas des questions (Entete, section)
-                if q.question_type in ['Entete', 'section']:
-                    continue
-                    
-                field_name = f"question_{q.id}"
-                valeur = form.cleaned_data.get(field_name)
+            try:
+                with transaction.atomic():
+                    submission = Submission.objects.create(survey=survey, enumerator=request.user)
                 
-                # Initialisation des données de réponse
-                answer_data = {
-                    "submission": submission,
-                    "question": q,
-                }
+                    for q in questions:
+                        # Ignorer les types qui ne sont pas des questions (Entete, section)
+                        if q.question_type in ['Entete', 'section']:
+                            continue
+                            
+                        field_name = f"question_{q.id}"
+                        valeur = form.cleaned_data.get(field_name)
+                        
+                        # Initialisation des données de réponse
+                        answer_data = {
+                            "submission": submission,
+                            "question": q,
+                        }
 
-                # CAS 1 : Fichiers (Image ou Audio)
-                if q.question_type in ['image', 'audio']:
-                    if valeur: # 'valeur' contient ici un objet UploadedFile
-                        answer_data["file_upload"] = valeur
-                        answer_data["value"] = valeur.name # On garde le nom du fichier en texte par précaution
-                
-                # CAS 2 : Choix multiples (Checkbox)
-                elif q.question_type == 'checkbox':
-                    if isinstance(valeur, list):
-                        answer_data["value"] = ", ".join(map(str, valeur))
-                    else:
-                        answer_data["value"] = str(valeur) if valeur else ""
-                
-                # CAS 3 : Autres types (text, textarea, number, select, date)
-                else:
-                    answer_data["value"] = str(valeur) if valeur else ""
+                        # CAS 1 : Fichiers (Image ou Audio)
+                        if q.question_type in ['image', 'audio']:
+                            if valeur: # 'valeur' contient ici un objet UploadedFile
+                                answer_data["file_upload"] = valeur
+                                answer_data["value"] = valeur.name # On garde le nom du fichier en texte par précaution
+                        
+                        # CAS 2 : Choix multiples (Checkbox)
+                        elif q.question_type == 'checkbox':
+                            if isinstance(valeur, list):
+                                answer_data["value"] = ", ".join(map(str, valeur))
+                            else:
+                                answer_data["value"] = str(valeur) if valeur else ""
+                        
+                        # CAS 3 : Autres types (text, textarea, number, select, date)
+                        else:
+                            answer_data["value"] = str(valeur) if valeur else ""
 
-                # Création de la réponse
-                Answer.objects.create(**answer_data)
+                        # Création de la réponse
+                        Answer.objects.create(**answer_data)
 
-            return redirect('survey_builder:success')
+                return redirect('survey_builder:success', survey.uid)
+            except Exception as e:
+                # En cas d'erreur de base de données, la transaction est annulée automatiquement
+                form.add_error(None, f"Une erreur technique est survenue : {e}")
     else:
         form = DynamicSurveyForm(survey)
         
@@ -68,13 +75,18 @@ def survey_list(request):
     surveys = Survey.objects.filter(is_active=True)
     return render(request, 'survey_builder/list.html', {'surveys': surveys})
 #
-def survey_success(request):
-    return render(request, 'survey_builder/success.html')
+def survey_success(request,uid):
+    survey = get_object_or_404(Survey, uid=uid)
+    context = {
+        "survey": survey  # On passe l'objet entier
+    }
+
+    return render(request, 'survey_builder/success.html', context)
 #############
 
 @staff_member_required
-def survey_analytics(request, survey_id):
-    survey = get_object_or_404(Survey, id=survey_id)
+def survey_analytics(request, uid):
+    survey = get_object_or_404(Survey, uid=uid)
     submissions = Submission.objects.filter(survey=survey)
     total = submissions.count()
     
@@ -121,10 +133,10 @@ def survey_analytics(request, survey_id):
                 display_type = 'text'
                 data = answers[:10]
             #TEXT COURT
-            elif unique_count > (total * 0.7) and total > 2:
+            elif q.question_type in ['text', 'number', 'date']:
                 display_type = 'text'
-                data = answers # Liste brute
-            # 4. CAS : CHOIX UNIQUES (Select / Radio)
+                data = list(answers) # On affiche toutes les réponses (le scroll gérera l'affichage)
+                    # 4. CAS : CHOIX UNIQUES (Select / Radio)
             else:
                 display_type = 'pie'
                 data_counts = {}

@@ -10,18 +10,21 @@
                     <p class="text-muted small">Accédez à vos données statistiques sécurisées</p>
                 </div>
                 
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        {{ form.username.label_tag }}
-                        <input type="text" name="username" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        {{ form.password.label_tag }}
-                        <input type="password" name="password" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100 py-2 rounded-pill">Se connecter</button>
-                </form>
+               <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        {{ form.username.label_tag }}
+        <input type="text" name="username" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <div class="d-flex justify-content-between">
+            {{ form.password.label_tag }}
+            <a href="{% url 'password_reset' %}" class="small text-decoration-none">Mot de passe oublié ?</a>
+        </div>
+        <input type="password" name="password" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-primary w-100 py-2 rounded-pill">Se connecter</button>
+</form>
                 
                 <div class="text-center mt-3">
                     <small>Pas encore de compte ? <a href="{% url 'statapp:register' %}">S'inscrire</a></small>

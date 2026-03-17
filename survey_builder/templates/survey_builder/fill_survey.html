@@ -80,13 +80,13 @@
                 <input class="form-check-input" type="checkbox" 
                        name="question_{{ question.id }}" 
                        id="opt-{{ option.id }}" 
-                       value="{{ option.value }}">
-                <label class="form-check-label ms-2" for="opt-{{ option.id }}">
+                       value="{{ option.value }}"
+                       {% if question.required %}data-required="true"{% endif %}> <label class="form-check-label ms-2" for="opt-{{ option.id }}">
                     {{ option.text }}
                 </label>
             </div>
         {% endfor %}
-        </div>
+    </div>
 
                                 {% elif question.question_type == 'date' %}
                                     <input type="date" name="question_{{ question.id }}" class="form-control custom-input" {% if question.required %}required{% endif %}>
@@ -235,34 +235,51 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function validateStep() {
-        let valid = true;
-        const currentInputs = steps[currentStep].querySelectorAll('[required]');
-        
-        currentInputs.forEach(input => {
-            const card = input.closest('.question-card');
-            // On ne valide que si la question est visible
-            if (card && card.style.display !== 'none') {
-                let isFieldEmpty = false;
-                
-                if (input.type === 'checkbox' || input.type === 'radio') {
-                    const name = input.getAttribute('name');
-                    const checked = steps[currentStep].querySelector(`input[name="${name}"]:checked`);
-                    if (!checked) isFieldEmpty = true;
-                } else if (!input.value.trim()) {
-                    isFieldEmpty = true;
-                }
+    let stepValid = true;
+    const currentVisibleCards = steps[currentStep].querySelectorAll('.question-card');
+    
+    currentVisibleCards.forEach(card => {
+        // On ne valide que si la carte est affichée (Skip Logic)
+        if (card.style.display !== 'none') {
+            const requiredInputs = card.querySelectorAll('[required], input[data-required="true"]');
+            if (requiredInputs.length === 0) return;
 
-                if (isFieldEmpty) {
-                    input.classList.add('is-invalid');
-                    const error = card.querySelector('.invalid-feedback');
-                    if (error) error.style.display = 'block';
-                    valid = false;
-                }
+            let cardValid = true;
+            const firstInput = requiredInputs[0];
+            const name = firstInput.getAttribute('name');
+
+            // --- CAS SPÉCIFIQUE : CHECKBOX / RADIO ---
+            if (firstInput.type === 'checkbox' || firstInput.type === 'radio') {
+                const isChecked = !!steps[currentStep].querySelector(`input[name="${name}"]:checked`);
+                if (!isChecked) cardValid = false;
+            } 
+            // --- CAS GÉNÉRAL : TEXT, SELECT, ETC. ---
+            else {
+                if (!firstInput.value.trim()) cardValid = false;
             }
-        });
-        return valid;
-    }
 
+            // --- APPLICATION VISUELLE DE L'ERREUR ---
+            const errorFeedback = card.querySelector('.invalid-feedback');
+            if (!cardValid) {
+                stepValid = false;
+                card.classList.add('border-danger'); // On colore la bordure de la carte
+                if (errorFeedback) errorFeedback.style.display = 'block';
+                
+                // Pour les inputs classiques, on ajoute la classe rouge
+                requiredInputs.forEach(input => {
+                    if (input.type !== 'checkbox' && input.type !== 'radio') {
+                        input.classList.add('is-invalid');
+                    }
+                });
+            } else {
+                card.classList.remove('border-danger');
+                if (errorFeedback) errorFeedback.style.display = 'none';
+                requiredInputs.forEach(input => input.classList.remove('is-invalid'));
+            }
+        }
+    });
+    return stepValid;
+}
     // --- 3. ÉVÉNEMENTS ---
     form.addEventListener('change', applySkipLogic);
 
@@ -293,6 +310,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialisation
     applySkipLogic();
     showStep(currentStep);
+    // --- 4. VALIDATION FINALE À LA SOUMISSION ---
+form.addEventListener('submit', function(e) {
+    // On valide la dernière étape avant de laisser partir le formulaire
+    if (!validateStep()) {
+        e.preventDefault(); // Stoppe l'envoi
+        
+        // Optionnel : Scroller vers la première erreur de la page
+        const firstError = steps[currentStep].querySelector('.is-invalid');
+        if (firstError) {
+            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return false;
+    }
+    
+    // Si c'est valide, on peut désactiver le bouton pour éviter les doubles clics
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
+});
 });
 </script>
 {% endblock content %}

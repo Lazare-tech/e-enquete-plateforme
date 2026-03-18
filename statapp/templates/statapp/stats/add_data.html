@@ -117,18 +117,19 @@ document.addEventListener('DOMContentLoaded', function() {
             // 1. Validation de la catégorie
             const catSelect = form.querySelector('select[name="category"]');
             const newCatInput = form.querySelector('input[name*="category_title"]');
-            
+            const descriptionInput = form.querySelector('textarea[name="description"]');
             if (catSelect && !catSelect.value && (!newCatInput || !newCatInput.value.trim())) {
                 showFieldError(catSelect, "Veuillez choisir une catégorie ou en créer une.");
                 isFormValid = false;
             }
 
             // 2. Validation des autres champs
-            const fieldsToValidate = form.querySelectorAll('input[name="title"], input[name="label"], input[name="file"], input[name="value"]');
+            const fieldsToValidate = form.querySelectorAll('input[name="title"], input[name="label"], input[name="file"], input[name="value"],textarea[name="description"]');
             fieldsToValidate.forEach(field => {
                 if (field.type !== 'file' && !field.value.trim()) {
                     showFieldError(field, "Ce champ est obligatoire.");
                     isFormValid = false;
+              
                 } else if (field.type === 'file' && !field.files.length) {
                     showFieldError(field, "Veuillez sélectionner un fichier.");
                     isFormValid = false;

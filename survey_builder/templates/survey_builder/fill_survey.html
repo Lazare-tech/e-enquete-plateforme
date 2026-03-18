@@ -91,18 +91,31 @@
                                 {% elif question.question_type == 'date' %}
                                     <input type="date" name="question_{{ question.id }}" class="form-control custom-input" {% if question.required %}required{% endif %}>
                                     {% elif question.question_type == 'image' %}
-    <div class="d-flex align-items-center bg-light p-3 rounded-3 border border-dashed">
-        <i class="fas fa-camera text-primary me-3 fa-lg"></i>
-        <input type="file" name="question_{{ question.id }}" accept="image/*" capture="environment" class="form-control border-0 bg-transparent shadow-none" {% if question.required %}required{% endif %}>
+    <div class="d-flex align-items-center bg-light p-2 p-md-3 rounded-3 border border-dashed w-100">
+        <i class="fas fa-camera text-primary me-2 me-md-3 fa-lg"></i>
+        <input type="file" 
+               name="question_{{ question.id }}" 
+               accept="image/*" 
+               capture="environment" 
+               class="form-control border-0 bg-transparent shadow-none" 
+               style="font-size: 14px;"
+               {% if question.required %}required{% endif %}>
     </div>
-    <p class="text-muted small mt-2"><i class="fas fa-info-circle me-1"></i> Cliquez pour prendre une photo ou choisir un fichier.</p>
+    <p class="text-muted small mt-1 mb-0"><i class="fas fa-info-circle me-1"></i> Prendre une photo ou choisir un fichier.</p>
 
-                                {% elif question.question_type == 'audio' %}
-                                    <div class="d-flex align-items-center bg-light p-3 rounded-3 border border-dashed">
-                                        <i class="fas fa-microphone text-primary me-3 fa-lg"></i>
-                                        <input type="file" name="question_{{ question.id }}" accept="audio/*" capture="microphone" class="form-control border-0 bg-transparent shadow-none" {% if question.required %}required{% endif %}>
-                                    </div>
-                                {% endif %}
+{% elif question.question_type == 'audio' %}
+    <div class="d-flex align-items-center bg-light p-2 p-md-3 rounded-3 border border-dashed w-100">
+        <i class="fas fa-microphone text-primary me-2 me-md-3 fa-lg"></i>
+        <input type="file" 
+               name="question_{{ question.id }}" 
+               accept="audio/*" 
+               capture="microphone" 
+               class="form-control border-0 bg-transparent shadow-none"
+               style="font-size: 14px;"
+               {% if question.required %}required{% endif %}>
+    </div>
+    <p class="text-muted small mt-1 mb-0"><i class="fas fa-info-circle me-1"></i> Lancer l'enregistrement vocal.</p>
+{% endif %}
                                 
                                 <div class="invalid-feedback text-danger fw-medium small mt-2" style="display: none;">
                                     <i class="fas fa-exclamation-triangle me-1"></i> Ce champ est obligatoire.
@@ -115,41 +128,85 @@
         </div> 
     </div>
 
-    <div class="d-flex justify-content-between mt-5 p-3 bg-white shadow rounded-pill sticky-bottom mx-auto" style="max-width: 600px; border: 1px solid #eee;">
-        <button type="button" id="prevBtn" class="btn btn-light rounded-pill px-4 fw-bold">Précédent</button>
-        <div class="align-self-center text-primary fw-bold">Page <span id="step-index">1</span></div>
-        <button type="button" id="nextBtn" class="btn btn-primary rounded-pill px-5 fw-bold shadow">Suivant</button>
-        <button type="submit" id="submitBtn" class="btn btn-success rounded-pill px-5 fw-bold shadow" style="display: none;">Soumettre</button>
+    <div class="d-flex justify-content-between align-items-center mt-4 mt-md-5 p-2 p-md-3 bg-white shadow rounded-pill sticky-bottom mx-auto nav-survey-container">
+    <button type="button" id="prevBtn" class="btn btn-light rounded-pill px-3 px-md-4 fw-bold d-flex align-items-center">
+        <i class="fas fa-chevron-left me-md-2"></i>
+        <span class="d-none d-md-inline">Précédent</span>
+    </button>
+
+    <div class="text-primary fw-bold small-mobile-text">
+        <span class="d-none d-sm-inline">Page</span> <span id="step-index">1</span>
     </div>
+
+    <button type="button" id="nextBtn" class="btn btn-primary rounded-pill px-4 px-md-5 fw-bold shadow d-flex align-items-center">
+        <span class="d-none d-md-inline">Suivant</span>
+        <span class="d-inline d-md-none">Suiv.</span>
+        <i class="fas fa-chevron-right ms-2"></i>
+    </button>
+
+    <button type="submit" id="submitBtn" class="btn btn-success rounded-pill px-4 px-md-5 fw-bold shadow" style="display: none;">
+        Soumettre
+    </button>
+</div>
 </form>
 </div>
-
 <style>
     :root { --shine-blue: #122046; }
-    body { background-color: #f4f7f6; font-family: 'Inter', sans-serif; }
-    .bg-f4f7f6 { background-color: #f4f7f6; }
+    body { background-color: #f4f7f6; font-family: 'Inter', sans-serif; overflow-x: hidden; }
     
-    .section-banner { border-top: 6px solid var(--shine-blue) !important; border-radius: 8px; }
-    
-    .question-card { border-radius: 12px; transition: transform 0.2s ease; border: 1px solid #eef2f7; }
-    .custom-input { border: 2px solid #e2e8f0; border-radius: 8px; padding: 12px 15px; background-color: #fff; }
-    .custom-input:focus { border-color: var(--shine-blue); box-shadow: 0 0 0 0.2rem rgba(18, 32, 70, 0.1); }
-    
-    .custom-radio { 
-        padding: 12px 15px; 
-        border: 2px solid #f1f5f9; 
-        border-radius: 8px; 
-        transition: 0.2s; 
-        cursor: pointer;
-        background: white;
+    /* Conteneur principal adaptatif */
+    .container { width: 100%; padding-left: 12px; padding-right: 12px; }
+
+    /* Forcer les champs à prendre toute la largeur */
+    .custom-input, .form-select, .form-control {
+        width: 100% !important;
+        display: block;
     }
-    .custom-radio:hover { background-color: #f8fafc; border-color: var(--shine-blue); }
-    .form-check-input:checked + .form-check-label { font-weight: bold; color: var(--shine-blue); }
+
+    /* Optimisation des cartes pour mobile */
+    .question-card { 
+        border-radius: 12px; 
+        border: 1px solid #eef2f7; 
+        margin-bottom: 1rem !important;
+    }
     
-    .is-invalid { border-color: #ef4444 !important; background-color: #fffafa; }
-    .sticky-bottom { bottom: 30px; z-index: 1000; }
-    
-    .italic { font-style: italic; opacity: 0.8; }
+    .card-body { padding: 1rem !important; } /* Moins d'espace perdu sur petit écran */
+
+    /* Bannière de section responsive */
+    .section-banner { 
+        padding: 1.5rem 1rem !important; 
+        border-top: 6px solid var(--shine-blue) !important; 
+        margin-bottom: 1.5rem !important;
+    }
+    .section-banner h1, .section-banner h2 { font-size: 1.4rem; }
+
+    /* Navigation collante adaptée au pouce (mobile) */
+    .sticky-bottom { 
+        bottom: 15px !important; 
+        width: 95% !important; 
+        max-width: 500px !important;
+        padding: 10px !important;
+    }
+
+    /* Media Queries spécifiques pour Phone */
+    @media (max-width: 576px) {
+        .container { py-3 !important; }
+        .h6, .form-label { font-size: 0.95rem; }
+        
+        /* Boutons plus larges pour faciliter le clic */
+        .btn { 
+            padding-left: 1.5rem !important; 
+            padding-right: 1.5rem !important; 
+            font-size: 0.9rem;
+        }
+        
+        /* Ajustement de la barre de progression pour gagner de la place */
+        .sticky-top { pt-1 !important; pb-2 !important; }
+    }
+
+    /* Animation */
+    .survey-step { animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 </style>
 
 <script>

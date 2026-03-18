@@ -1,11 +1,12 @@
 from django.contrib import admin
-from .models import Category, StatFile, UserFileAccess,FAQ,StatVariable,VariableCategory
+from .models import Category, StatFile, UserFileAccess,FAQ,StatVariable,VariableCategory,Document
 from django.contrib.auth.models import User
 from django import forms
 from adminsortable2.admin import SortableAdminMixin
 from openpyxl.styles import Font, Alignment, PatternFill
 from django.http import HttpResponse
 import csv
+from django.utils.html import format_html  
 from openpyxl import Workbook
 import openpyxl
 ##############################################################################
@@ -220,3 +221,32 @@ class StatVariableAdmin(admin.ModelAdmin):
     search_fields = ('label', 'value')
     # Permet de changer de catégorie directement dans la liste
     list_editable = ('category',)
+#####################################################################
+@admin.register(Document)
+class DocumentAdmin(admin.ModelAdmin):
+    # Colonnes visibles dans la liste des documents
+    list_display = ('titre', 'ajoute_par', 'date_upload', 'apercu_fichier')
+    list_filter = ('date_upload', 'ajoute_par')
+    search_fields = ('titre', 'description')
+    
+    # On cache les champs automatiques pour ne pas encombrer le formulaire
+    exclude = ('ajoute_par', 'slug')
+
+    def save_model(self, request, obj, form, change):
+        # On enregistre l'utilisateur qui a fait l'upload
+        if not obj.pk:
+            obj.ajoute_par = request.user
+        super().save_model(request, obj, form, change)
+
+    def apercu_fichier(self, obj):
+        if obj.fichier:
+            return format_html(
+                '<a href="{}" target="_blank" style="font-weight:bold; color:#122046;">'
+                '<i class="fas fa-external-link-alt"></i> Ouvrir le document'
+                '</a>',
+                obj.fichier.url
+            )
+        return "Aucun fichier"
+    
+    apercu_fichier.allow_tags = True # Autorise le HTML pour le lien
+    apercu_fichier.short_description = "Lien de téléchargement"

@@ -1,191 +1,364 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-2" id="mainNavbar">
+
   <div class="container-fluid">
 
+
     <a class="navbar-brand d-flex align-items-center me-3" href="/">
+
       <img src="images/shine.jpg" alt="logo" style="width:70px; height:auto;">
+
     </a>
+
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMainContent"
+
       aria-controls="navbarMainContent" aria-expanded="false" aria-label="Toggle navigation">
+
       <span class="navbar-toggler-icon"></span>
+
     </button>
 
+
     <div class="collapse navbar-collapse" id="navbarMainContent">
+
      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 
+
     <li class="nav-item me-3"> 
+
         <a class="nav-link text-dark text-decoration-none fw-medium {% if request.resolver_match.url_name == 'search' and not request.GET.category %}active-nav{% endif %}" 
+
            href="{% url 'statapp:search' %}">
+
            Catalogue de données
+
         </a>
+
     </li>
+
 
     <li class="nav-item dropdown me-3">
+
     <a class="nav-link dropdown-toggle text-decoration-none text-dark fw-medium {% if request.GET.category %}active-nav{% endif %}" 
+
        href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+
        Catégories
+
     </a>
+
     <ul class="dropdown-menu border-0 shadow-sm mt-2" aria-labelledby="categoriesDropdown">
+
         {% for cat in all_categories %}
+
         <li>
+
             <a class="dropdown-item d-flex align-items-center py-2 {% if request.GET.category == cat.slug %}active-sub{% endif %}" 
+
                href="{% url 'statapp:search' %}?category={{ cat.slug }}"
+
                {% if request.resolver_match.url_name == 'search' %}
+
                   hx-get="{% url 'statapp:search' %}?category={{ cat.slug }}"
+
                   hx-target="#fileGrid"
+
                   hx-push-url="true"
+
                   hx-trigger="click"
+
                {% endif %}>
+
               {{ cat.title }}
+
             </a>
+
         </li>
+
         {% empty %}
+
         <li class="px-3 small text-muted">Aucune catégorie</li>
+
         {% endfor %}
+
     </ul>
+
 </li>
 
-    <li class="nav-item me-3">
-        <a class="nav-link text-decoration-none text-dark fw-medium {% if 'survey_builder' in request.resolver_match.app_name %}active-nav{% endif %}" 
-           href="{% url 'survey_builder:list' %}">
-           Liste des Formulaires
-        </a>
-    </li>
 
     <li class="nav-item me-3">
-        <a class="nav-link text-dark text-decoration-none fw-medium {% if request.resolver_match.url_name == 'faq' %}active-nav{% endif %}" 
-           href="{% url 'statapp:faq' %}">
-           Aide & FAQ
+
+        <a class="nav-link text-decoration-none text-dark fw-medium {% if 'survey_builder' in request.resolver_match.app_name %}active-nav{% endif %}" 
+
+           href="{% url 'survey_builder:list' %}">
+
+           Liste des Formulaires
+
         </a>
+
     </li>
+
+
+    <li class="nav-item me-3">
+
+        <a class="nav-link text-dark text-decoration-none fw-medium {% if request.resolver_match.url_name == 'faq' %}active-nav{% endif %}" 
+
+           href="{% url 'statapp:faq' %}">
+
+           Aide & FAQ
+
+        </a>
+
+    </li>
+
 </ul>
-      <div class="d-flex align-items-center ms-lg-4"> 
+
+      <div class="d-flex align-items-center  ms-lg-4"> 
+
   
+
+   
+
+    <a class="fw-bold text-white btn btn-success btn-sm me-2 me-md-3  shadow-sm" href="{% url 'statapp:add_data' %}">
+
+  <i class="fas fa-plus-circle me-1"></i> Ajouter des données
+
+</a>
+
   {% if user.is_authenticated %}
-    <a class="fw-bold text-white btn btn-success btn-button-success btn-sm me-3 px-3 py-2 shadow-sm" href="{% url 'statapp:add_data' %}">
-      <i class="fas fa-plus-circle me-1"></i> Ajouter des données
-    </a>
+
 
     <div class="dropdown">
+
       <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+
         <div class="user-avatar-circle">
+
           {{ user.username|slice:":1"|upper }}
+
         </div>
+
       </a>
 
+
       <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="userDropdown">
+
         <li class="px-3 py-2 border-bottom">
+
           <p class="small text-muted mb-0">Connecté en tant que</p>
+
           <p class="fw-bold mb-0 text-truncate" style="max-width: 150px;">{{ user.email|default:user.username }}</p>
+
         </li>
+
         
+
         <li>
+
           <form action="{% url 'statapp:logout' %}" method="post" class="d-inline">
+
             {% csrf_token %}
+
             <button type="submit" class="dropdown-item text-danger py-2 border-0 bg-transparent w-100 text-start">
+
               <i class="fas fa-sign-out-alt me-2"></i> Déconnexion
+
             </button>
+
           </form>
+
         </li>
+
       </ul>
+
     </div>
+
 
   {% else %}
-    <a href="{% url 'statapp:login' %}" class="btn btn-outline-primary btn-button-priary btn-sm me-2 px-3 rounded-pill">
-      Se connecter
-    </a>
+
+
+    <a href="{% url 'statapp:login' %}" class="btn btn-outline-primary  btn-sm me-2 px-3 py-2 px-md-3 py-md-2 rounded-pill fw-bold">
+
+  Se connecter
+
+</a>
+
     <a href="{% url 'statapp:register' %}" class="btn btn-primary btn-button-primary btn-sm px-3 rounded-pill shadow-sm">
+
       S'inscrire
+
     </a>
+
   {% endif %}
 
+
 </div>
+
           </ul>
+
         </div>
 
+
       </div>
+
     </div>
+
   </div>
+
 </nav>
 
+
 <style>
+
+
 /* Variables d'identité visuelle */
+
 :root {
+
     --shine-blue: #122046;
+
     --shine-gold: #D4AF37;
+
 }
+
 .nav-link {
+
     position: relative;
+
     padding-bottom: 5px;
+
     transition: color 0.3s ease;
+
 }
+
 
 /* Le trait décoratif caché par défaut */
+
 .nav-link::after {
+
     content: '';
+
     position: absolute;
+
     width: 0;
+
     height: 3px;
+
     bottom: -2px;
+
     left: 0;
+
     background-color: blue;
+
     transition: width 0.3s ease;
+
     border-radius: 2px;
+
 }
 
+
 /* Affichage du trait quand le menu est actif */
+
 .active-nav::after {
+
     width: 100%;
+
 }
+
 
 
 
 /* Indicateur pour les sous-catégories dans le dropdown */
+
 .active-sub {
+
     background-color: #f0f4ff;
+
     border-left: 4px solid blue;
+
     font-weight: bold;
+
     color: blue !important;
+
 }
+
 
 /* Effet de survol pour les autres menus */
+
 .nav-link:hover::after {
+
     width: 100%;
+
 }
+
 .user-avatar-circle {
+
     width: 40px;
+
     height: 40px;
+
     background-color: var(--shine-blue);
+
     color: white;
+
     border-radius: 50%;
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
     font-weight: bold;
+
     font-size: 0.9rem;
+
     border: 2px solid var(--shine-gold);
+
     transition: all 0.3s ease;
+
 }
+
 
 .dropdown-toggle::after {
+
     display: none; 
+
 }
+
 
 .nav-link:hover {
+
     color: var(--shine-blue) !important;
+
     text-decoration: underline;
+
 }
+
 
 .dropdown-item:hover {
+
     background-color: #f8f9fa;
+
     color: var(--shine-blue);
+
     padding-left: 1.5rem;
+
     transition: padding 0.2s ease;
+
 }
 
+
 /* Bouton Succès personnalisé pour l'ajout */
+
 .btn-success {
+
     background-color: #28a745;
+
     border: none;
+
 }
+
 </style>
+
+

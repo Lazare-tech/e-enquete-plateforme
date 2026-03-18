@@ -1,22 +1,33 @@
 {% for file in files %}
-<div class="col-md-6 col-lg-4">
-    <div class="card h-100 border-0 shadow-sm hover-lift transition">
+<div class="col-md-6 col-lg-4 mb-4"> <div class="card h-100 border-0 shadow-sm hover-lift transition">
         <div class="card-body p-4 text-center">
-            <div class="mb-3 text-success">
-                {% if file.get_extension == 'csv' %}
-                    <i class="fas fa-file-csv fa-3x text-info"></i>
-                {% else %}
-                    <i class="fas fa-file-excel fa-3x"></i>
-                {% endif %}
+            <div class="mb-3">
+                {% with ext=file.get_extension|lower %}
+                    {% if ext == 'csv' %}
+                        <i class="fas fa-file-csv fa-3x text-info"></i>
+                    {% elif ext == 'pdf' %}
+                        <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                    {% elif ext == 'doc' or ext == 'docx' %}
+                        <i class="fas fa-file-word fa-3x text-primary"></i>
+                    {% elif ext == 'xls' or ext == 'xlsx' %}
+                        <i class="fas fa-file-excel fa-3x text-success"></i>
+                    {% else %}
+                        <i class="fas fa-file-alt fa-3x text-secondary"></i>
+                    {% endif %}
+                {% endwith %}
             </div>
+            
             <span class="badge bg-light text-primary border border-primary mb-2">
                 {{ file.category.title }}
             </span>
-            <h5 class="fw-bold mb-2">{{ file.title }}</h5>
+            
+            <h5 class="fw-bold mb-2 text-truncate">{{ file.title }}</h5>
+            
             <p class="text-muted small mb-4 text-truncate-3">
                 {{ file.description|default:"Aucune description disponible." }}
             </p>
-            <a href="{% url 'statapp:detail' file.slug %}" class="btn btn-primary w-100 rounded-pill shadow-sm">
+            
+            <a href="{% url 'statapp:detail' file.slug %}" class="btn btn-primary w-100 rounded-pill shadow-sm fw-bold">
                 Consulter les détails
             </a>
         </div>

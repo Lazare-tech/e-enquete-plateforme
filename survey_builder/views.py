@@ -88,55 +88,50 @@ def survey_success(request,uid):
 def survey_analytics(request, uid):
     survey = get_object_or_404(Survey, uid=uid)
     submissions = Submission.objects.filter(survey=survey)
-    total = submissions.count()
+    total_submissions = submissions.count() # Le total global du formulaire
     
-    # On récupère toutes les questions valides
     questions = survey.questions.exclude(question_type__in=['Entete', 'section']).order_by('order')
-    
     all_stats = []
     
     for q in questions:
-        # On récupère toutes les réponses pour cette question
+        # On récupère les valeurs brutes
         answers_qs = Answer.objects.filter(question=q).values_list('value', flat=True)
-        answers = [a for a in answers_qs if a] # On filtre les vides
+        # On filtre les réponses vides pour ne compter que les vrais remplissages
+        answers = [a for a in answers_qs if a and str(a).strip()]
         
-        if not answers:
+        # Nombre réel de personnes ayant répondu à CETTE question
+        filled_count = len(answers)
+        
+        if filled_count == 0:
             continue
 
-        # --- LOGIQUE DE DÉTECTION ---
         display_type = 'pie'
         data = []
         
-        # 1. CAS : CASES À COCHER (Stockées souvent en "val1, val2")
+        # 1. CAS : CASES À COCHER
         if q.question_type == 'checkbox':
             display_type = 'bar'
             data_counts = {}
             for a in answers:
-                # On split si c'est une chaîne séparée par des virgules
-                parts = [p.strip() for p in a.split(',')]
+                parts = [p.strip() for p in str(a).split(',')]
                 for choice in parts:
                     data_counts[choice] = data_counts.get(choice, 0) + 1
             data = [{'answer_value': k, 'count': v} for k, v in data_counts.items()]
 
         else:
             total_chars = sum(len(str(a)) for a in answers)
-            avg_length = total_chars / len(answers) if answers else 0
+            avg_length = total_chars / filled_count
             unique_count = len(set(answers))
 
-            # 2. CAS : PARAGRAPHES (Textes longs)
             if q.question_type == 'textarea' or avg_length > 60:
                 display_type = 'paragraph'
-                data = answers[:15] # On limite à 15 pour l'affichage
-
-            # 3. CAS : RÉPONSES COURTES (Identifiants uniques)
-            elif unique_count > (total * 0.8) and total > 3:
+                data = answers # On passe tout, le scroll du template gérera
+            elif unique_count > (total_submissions * 0.8) and total_submissions > 3:
                 display_type = 'text'
-                data = answers[:10]
-            #TEXT COURT
+                data = answers
             elif q.question_type in ['text', 'number', 'date']:
                 display_type = 'text'
-                data = list(answers) # On affiche toutes les réponses (le scroll gérera l'affichage)
-                    # 4. CAS : CHOIX UNIQUES (Select / Radio)
+                data = answers
             else:
                 display_type = 'pie'
                 data_counts = {}
@@ -147,11 +142,12 @@ def survey_analytics(request, uid):
         all_stats.append({
             'label': q.label,
             'display_type': display_type,
-            'data': data
+            'data': data,
+            'filled_count': filled_count  # <-- ON AJOUTE CELA ICI
         })
 
     return render(request, 'survey_builder/survey_analytics.html', {
         'all_stats': all_stats, 
         'survey': survey, 
-        'total': total
+        'total': total_submissions
     })

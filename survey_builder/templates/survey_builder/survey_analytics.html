@@ -14,7 +14,7 @@
         <h1 class="h2 fw-normal mb-3">{{ survey.title }}</h1>
         <div class="d-flex align-items-center border-top pt-3">
             <span class="response-badge">{{ total }} réponse{{ total|pluralize }}</span>
-            <small class="ms-3 text-muted">Résumé analytique - Shine Agency</small>
+            <small class="ms-3 text-muted">Résumé analytique - Data</small>
         </div>
     </div>
 
@@ -23,7 +23,7 @@
         <div class="col-12 mb-4">
             <div class="stat-card shadow-sm">
                 <h3 style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">{{ stat.label }}</h3>
-                <p style="color: #70757a; font-size: 14px; margin-bottom: 20px;">{{ total }} réponses</p>
+                <p style="color: #70757a; font-size: 14px; margin-bottom: 20px;">{{ stat.filled_count }} réponses</p>
 
                {% if stat.display_type == 'paragraph' %}
         <div class="scroll-container" style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
@@ -66,19 +66,24 @@ document.addEventListener('DOMContentLoaded', function() {
     {% for stat in all_stats %}
     {% if stat.display_type == 'pie' or stat.display_type == 'bar' %}
     new Chart(document.getElementById('chart-{{ forloop.counter0 }}'), {
+        // Le type reste 'bar', c'est l'option indexAxis qui définit l'orientation
         type: '{% if stat.display_type == "pie" %}pie{% else %}bar{% endif %}',
         data: {
             labels: [{% for item in stat.data %}"{{ item.answer_value|safe }}",{% endfor %}],
             datasets: [{
                 data: [{% for item in stat.data %}{{ item.count }},{% endfor %}],
-                backgroundColor: {% if stat.display_type == 'pie' %}googleColors{% else %}'#4285F4'{% endif %},
-                borderWidth: 0
+                // On applique les couleurs Google aussi aux barres pour plus de peps
+                backgroundColor: googleColors, 
+                borderWidth: 0,
+                borderRadius: 5 // Optionnel : arrondit un peu le haut des barres
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            indexAxis: '{% if stat.display_type == "bar" %}y{% else %}x{% endif %}',
+            // --- CHANGEMENT ICI ---
+            // 'x' pour vertical (les barres montent), 'y' pour horizontal
+            indexAxis: 'x', 
             plugins: {
                 legend: { 
                     display: {% if stat.display_type == 'pie' %}true{% else %}false{% endif %},
@@ -86,13 +91,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             },
             scales: {
-                x: { display: {% if stat.display_type == "bar" %}true{% else %}false{% endif %}, beginAtZero: true },
-                y: { display: {% if stat.display_type == "bar" %}true{% else %}false{% endif %} }
+                // On affiche les deux axes pour les graphiques en barres
+                x: { 
+                    display: {% if stat.display_type == "bar" %}true{% else %}false{% endif %},
+                    grid: { display: false } // Optionnel : épure le graphique
+                },
+                y: { 
+                    display: {% if stat.display_type == "bar" %}true{% else %}false{% endif %},
+                    beginAtZero: true 
+                }
             }
         }
     });
     {% endif %}
     {% endfor %}
+
 });
 </script>
 {% endblock %}

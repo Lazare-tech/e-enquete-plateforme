@@ -34,7 +34,7 @@ CSRF_TRUSTED_ORIGINS = ['https://*.ngrok-free.app']
 mimetypes.add_type("audio/mp4", ".m4a", True)
 mimetypes.add_type("audio/aac", ".aac", True)
 SITE_ID = 1
-DOMAIN_NAME = '48db-41-138-107-85.ngrok-free.app'
+DOMAIN_NAME ='9add-41-138-107-85.ngrok-free.app'
 # EN PROD 
 # EMAIL_HOST = 'smtp.gmail.com'
 # EMAIL_PORT = 587
@@ -178,6 +178,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # Les fichiers iront dans le dossie
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Où aller après s'être connecté ? (Vers ton catalogue)
 LOGIN_REDIRECT_URL = '/' 
-
+LOGIN_URL = 'statapp:login'  # Ou '/connexion/' si tu n'utilises pas les namespaces
 # Où aller après s'être déconnecté ?
 LOGOUT_REDIRECT_URL = '/'

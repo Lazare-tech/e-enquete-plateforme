@@ -4,7 +4,9 @@ from django.db import models
 from django.db import models
 from django.utils.text import slugify
 import os
-
+from django.contrib.auth.models import User
+from django.core.validators import FileExtensionValidator
+###################################################################
 class Category(models.Model):
     """Permet de classer les données (ex: Économie, Santé, Démographie)"""
     title = models.CharField(max_length=100, verbose_name="Titre de la catégorie",unique=True)
@@ -133,3 +135,39 @@ class FAQ(models.Model):
 
     def __str__(self):
         return self.question
+##########
+
+
+class Document(models.Model):
+    titre = models.CharField(max_length=255, verbose_name="Nom du document")
+    slug = models.SlugField(unique=True, blank=True)
+    description = models.TextField(verbose_name="Notes / Description", blank=True)
+    
+    # Stockage physique sur le serveur
+    fichier = models.FileField(
+        upload_to='archives_agence/%Y/%m/',
+        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'doc', 'docx', 'xls', 'xlsx', 'csv', 'png', 'jpg'])],
+        verbose_name="Fichier"
+    )
+    
+    # Traçabilité
+    date_upload = models.DateTimeField(auto_now_add=True, verbose_name="Date d'ajout")
+    ajoute_par = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        verbose_name="Agent responsable"
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.titre)
+        super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = "Document Agence"
+        verbose_name_plural = "Documents Agence"
+        ordering = ['-date_upload']
+
+    def __str__(self):
+        return self.titre

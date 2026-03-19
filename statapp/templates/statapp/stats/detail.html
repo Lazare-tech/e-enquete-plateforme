@@ -1,8 +1,40 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{{ file.title }} - Détails{% endblock %}
+{% block title %}{{ file.title }} | Données Statistiques & Enquêtes{% endblock %}
 
+{% block meta_description %}{{ file.description|truncatewords:25 }}{% endblock %}
+
+{% block keywords %}{{ file.title }}, données {{ file.category.title }}, statistiques Burkina Faso, rapport enquête, dataset {{ file.get_extension }}{% endblock %}
+
+{% block extra_meta %}
+<link rel="canonical" href="{{ request.build_absolute_uri }}">
+
+<meta property="og:type" content="article"> <meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta property="og:title" content="Données : {{ file.title }} ({{ file.get_extension|upper }})">
+<meta property="og:description" content="{{ file.description|truncatechars:160 }}">
+<meta property="og:image" content="{% static 'images/portal-preview.jpg' %}"> <meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Fichier de données : {{ file.title }}">
+<meta name="twitter:description" content="{{ file.description|truncatechars:160 }}">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Dataset",
+  "name": "{{ file.title|escapejs }}",
+  "description": "{{ file.description|truncatechars:200|escapejs }}",
+  "url": "{{ request.build_absolute_uri }}",
+  "identifier": "{{ file.id }}",
+  "keywords": ["{{ file.category.title }}", "Statistiques", "Burkina Faso"],
+  "datePublished": "{{ file.created_at|date:'Y-m-d' }}",
+  "distribution": {
+    "@type": "DataDownload",
+    "encodingFormat": "{{ file.get_extension }}",
+    "contentUrl": "{{ request.build_absolute_uri }}"
+  }
+}
+</script>
+{% endblock extra_meta %}
 {% block content %}
 <div class="container py-5">
     <nav aria-label="breadcrumb" class="mb-4">

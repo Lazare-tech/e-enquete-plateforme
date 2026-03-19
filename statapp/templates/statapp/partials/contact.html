@@ -1,5 +1,26 @@
 {% extends "base.html" %}
-{% block title %}Contactez-nous{% endblock title %}
+{% load static %}
+{% block title %}Contactez le Support Data | Partenariat & Assistance{% endblock %}
+
+{% block meta_description %}Une question sur nos jeux de données ou besoin d'aide pour une enquête ? Notre équipe technique vous accompagne dans vos projets statistiques.{% endblock %}
+
+{% block keywords %}support technique data, aide portail statistique, accès données brutes, collaboration enquête Burkina{% endblock %}
+
+{% block og_title %}Contactez l'Équipe du Portail de Données | Support Client{% endblock %}
+{% block og_description %}Besoin d'un accès spécifique ou d'une assistance sur nos rapports ? Contactez notre équipe technique via ce formulaire.{% endblock %}
+{% block og_image %}{% static 'images/og-contact-portal.jpg' %}{% endblock %}
+
+{% block extra_meta %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  "name": "Contact Support Data Portal",
+  "description": "Formulaire officiel pour les demandes d'accès aux données et support statistique.",
+  "url": "{{ request.build_absolute_uri }}"
+}
+</script>
+{% endblock extra_meta %}
 {% block content %}
 <div class="container mt-5 mb-5">
     <div class="row justify-content-center">
@@ -58,38 +79,8 @@
     </div>
 </div>
 
-<style>
-    /* Effet de soulèvement personnalisé */
-    .custom-form-card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border-radius: 15px;
-        background-color: #ffffff;
-    }
-
-    .custom-form-card:hover {
-        transform: translateY(-5px); /* Soulève encore plus au survol */
-        box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important;
-    }
-
-    /* Style des inputs pour aller avec le design épuré */
-    .form-control {
-        border-radius: 8px;
-        padding: 12px;
-        border: 1px solid #e0e0e0;
-        transition: border-color 0.2s;
-    }
-
-    .form-control:focus {
-        box-shadow: none;
-        border-color: #0d6efd;
-    }
-
-    .transition-all {
-        transition: all 0.3s ease;
-    }
-</style>
-
 <script>
+
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('contactForm');
     const inputs = form.querySelectorAll('.form-control');

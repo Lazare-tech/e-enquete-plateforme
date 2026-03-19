@@ -4,25 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>{% block title %}Portail de données collaboratif | recherche & enquêtes{% endblock title %}</title>
-    <meta name="description" content="{% block meta_description %}Plateforme mutualisée pour la collecte,le traitement et la diffusion de données statistiques.Accédez aux ressources partagées par notre équipe pour vos études et rapports.{% endblock meta_description %}">
-    <meta name="keywords" content="portail de données,plateforme collaborative,partage de data,enquêtes terrain,statistiques Burkina,base de données partagée,outils d'enquête équipe">
-    <meta name="author" content="Votre Équipe">
-    <meta name="robots" content="index, follow">
+ <title>{% block title %}Portail de données collaboratif | Recherche & Enquêtes{% endblock %}</title>
+    
+    <meta name="description" content="{% block meta_description %}Plateforme mutualisée pour la collecte, le traitement et la diffusion de données statistiques au Burkina Faso.{% endblock %}">
+    <meta name="keywords" content="{% block keywords %}portail de données, plateforme collaborative, statistiques Burkina, enquêtes terrain{% endblock %}">
+    
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    <meta property="og:title" content="{% block og_title %}Portail de données - Plateforme collaborative{% endblock og_title %}">
-    <meta property="og:description" content="{% block og_description %}Consultez et téléchargez les données statistiques et rapports d'enquêtes de l'équipe.{% endblock og_description %}">
-    <meta property="og:image" content="{% static 'images/portal-preview.jpg' %}">
-    <meta property="og:site_name" content="Data Portal">
-
+    <meta property="og:title" content="{% block og_title %}Portail de données - Plateforme collaborative{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Consultez et téléchargez les données statistiques et rapports d'enquêtes.{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{% static 'images/portal-preview.jpg' %}{% endblock %}">
+    
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Portail de Données Collaboratif">
-    <meta name="twitter:description" content="Plateforme de gestion d'enquêtes et de distribution de rapports statistiques.">
-    <meta name="twitter:image" content="{% static 'images/portal-preview.jpg' %}">
-
-    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    <meta name="twitter:title" content="{% block twitter_title %}Portail de Données Collaboratif{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Plateforme de gestion d'enquêtes statistiques.{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}{% static 'images/portal-preview.jpg' %}{% endblock %}">
 
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'fontawesome-free/css/all.min.css' %}">

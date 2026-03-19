@@ -6,6 +6,7 @@ app_name = 'statapp'
 urlpatterns = [
    path('', statapp.views.homepage, name='homepage'),
    path('faq/', statapp.views.faq_view, name='faq'),
+   path('contact/', statapp.views.contact_view, name='contact'),
    path('detail/<slug:slug>/', statapp.views.detail_stat, name='detail'),
    path('catalogue/', statapp.views.search_files, name='search'),
    path('telecharger/<int:file_id>/', statapp.views.download_stat_file, name='download'),

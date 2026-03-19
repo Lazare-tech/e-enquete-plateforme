@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, StatFile, UserFileAccess,FAQ,StatVariable,VariableCategory,Document
+from .models import Category, StatFile, UserFileAccess,FAQ,StatVariable,VariableCategory,Document,ContactMessage
 from django.contrib.auth.models import User
 from django import forms
 from adminsortable2.admin import SortableAdminMixin
@@ -250,3 +250,24 @@ class DocumentAdmin(admin.ModelAdmin):
     
     apercu_fichier.allow_tags = True # Autorise le HTML pour le lien
     apercu_fichier.short_description = "Lien de téléchargement"
+########
+@admin.register(ContactMessage)
+class ContactMessageAdmin(admin.ModelAdmin):
+    # Colonnes affichées dans la liste
+    list_display = ('nom', 'email', 'objet', 'date_envoi')
+    
+    # Filtres sur le côté droit
+    list_filter = ('date_envoi', 'objet')
+    
+    # Barre de recherche (très utile quand tu auras beaucoup de messages)
+    search_fields = ('nom', 'email', 'objet', 'message')
+    
+    # Tri par défaut (les plus récents en premier)
+    ordering = ('-date_envoi',)
+    
+    # Rendre les champs en lecture seule pour éviter les modifs accidentelles
+    readonly_fields = ('nom', 'email', 'telephone', 'objet', 'message', 'date_envoi')
+
+    # Optionnel : Empêcher l'ajout manuel depuis l'admin (les messages viennent du site)
+    def has_add_permission(self, request):
+        return False

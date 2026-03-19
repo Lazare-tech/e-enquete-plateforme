@@ -11,7 +11,7 @@ from statapp.forms import CleanRegisterForm
 from .models import Category, StatFile,UserFileAccess,FAQ, VariableCategory
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .forms import StatFileForm, StatVariableForm
+from .forms import StatFileForm, StatVariableForm,ContactForm
 from django.http import JsonResponse
 from django.db import transaction
 # Create your views here.
@@ -32,6 +32,28 @@ def faq_view(request):
     }
     return render(request, 'statapp/partials/faq.html', context)
 # ###
+
+
+def contact_view(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            # Sauvegarde en base de données
+            form.save()
+            return JsonResponse({
+                'success': True,
+                'message': 'Votre message a été envoyé avec succès !'
+            })
+        else:
+            # On renvoie les erreurs du formulaire au format JSON
+            return JsonResponse({
+                'success': False, 
+                'errors': form.errors
+            })
+    
+    # Pour une requête GET classique
+    form = ContactForm()
+    return render(request, 'statapp/partials/contact.html', {'form': form})
 # def check_category(request):
 #     title = request.GET.get('title', '').strip()
 #     if not title:

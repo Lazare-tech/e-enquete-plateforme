@@ -1,42 +1,153 @@
+
+
+
 /* Variables d'identité visuelle */
+
 :root {
+
     --shine-blue: #122046;
+
     --shine-gold: #D4AF37;
+
+}
+
+.nav-link {
+
+    position: relative;
+
+    padding-bottom: 5px;
+
+    transition: color 0.3s ease;
+
+}
+
+
+/* Le trait décoratif caché par défaut */
+
+.nav-link::after {
+
+    content: '';
+
+    position: absolute;
+
+    width: 0;
+
+    height: 3px;
+
+    bottom: -2px;
+
+    left: 0;
+
+    background-color: blue;
+
+    transition: width 0.3s ease;
+
+    border-radius: 2px;
+
+}
+
+
+/* Affichage du trait quand le menu est actif */
+
+.active-nav::after {
+
+    width: 100%;
+
+}
+
+
+
+
+/* Indicateur pour les sous-catégories dans le dropdown */
+
+.active-sub {
+
+    background-color: #f0f4ff;
+
+    border-left: 4px solid blue;
+
+    font-weight: bold;
+
+    color: blue !important;
+
+}
+
+
+/* Effet de survol pour les autres menus */
+
+.nav-link:hover::after {
+
+    width: 100%;
+
 }
 
 .user-avatar-circle {
+
     width: 40px;
+
     height: 40px;
+
     background-color: var(--shine-blue);
+
     color: white;
+
     border-radius: 50%;
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
     font-weight: bold;
+
     font-size: 0.9rem;
+
     border: 2px solid var(--shine-gold);
+
     transition: all 0.3s ease;
+
 }
+
 
 .dropdown-toggle::after {
+
     display: none; 
+
 }
+
 
 .nav-link:hover {
+
     color: var(--shine-blue) !important;
+
     text-decoration: underline;
+
 }
+
 
 .dropdown-item:hover {
+
     background-color: #f8f9fa;
+
     color: var(--shine-blue);
+
     padding-left: 1.5rem;
+
     transition: padding 0.2s ease;
+
 }
 
+
 /* Bouton Succès personnalisé pour l'ajout */
+
 .btn-success {
+
     background-color: #28a745;
+
     border: none;
+
 }
+
+
+

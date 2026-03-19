@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}Contactez-nous{% endblock title %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            
+            <div id="successMessage" class="alert alert-success d-none mb-4 shadow-sm border-0 animate__animated animate__fadeIn">
+                <i class="fas fa-check-circle me-2"></i> Votre message a été envoyé avec succès !
+            </div>
+
+            <div class="card border-0 shadow-lg custom-form-card">
+                <div class="card-body p-4 p-md-5">
+                    <h2 class="text-center mb-4 fw-bold text-primary">Contactez-nous</h2>
+                    
+                    <form id="contactForm" method="POST" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-uppercase">Nom</label>
+                            {{ form.nom }}
+                            <div class="text-danger small mt-1 error-msg" id="error_nom"></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-uppercase">Email</label>
+                            {{ form.email }}
+                            <div class="text-danger small mt-1 error-msg" id="error_email"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-uppercase">Téléphone</label>
+                            {{ form.telephone }}
+                            <div class="text-danger small mt-1 error-msg" id="error_telephone"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-uppercase">Objet</label>
+                            {{ form.objet }}
+                            <div class="text-danger small mt-1 error-msg" id="error_objet"></div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-uppercase">Message</label>
+                            {{ form.message }}
+                            <div class="text-danger small mt-1 error-msg" id="error_message"></div>
+                        </div>
+
+                        <button type="submit" id="submitBtn" class="btn btn-primary w-100 fw-bold py-3 shadow-sm rounded-pill transition-all">
+                            <span id="btnText">Envoyer le message</span>
+                            <span id="btnSpinner" class="spinner-border spinner-border-sm d-none ms-2" role="status"></span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Effet de soulèvement personnalisé */
+    .custom-form-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 15px;
+        background-color: #ffffff;
+    }
+
+    .custom-form-card:hover {
+        transform: translateY(-5px); /* Soulève encore plus au survol */
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important;
+    }
+
+    /* Style des inputs pour aller avec le design épuré */
+    .form-control {
+        border-radius: 8px;
+        padding: 12px;
+        border: 1px solid #e0e0e0;
+        transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+        box-shadow: none;
+        border-color: #0d6efd;
+    }
+
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('contactForm');
+    const inputs = form.querySelectorAll('.form-control');
+
+    // 1. Suppression auto des erreurs à la saisie
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const errorDiv = document.getElementById(`error_${this.name}`);
+            if (errorDiv) {
+                errorDiv.innerText = ''; // Efface le texte d'erreur
+            }
+            this.classList.remove('is-invalid');
+        });
+    });
+
+    // 2. Gestion de l'envoi
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Reset erreurs
+        document.querySelectorAll('.error-msg').forEach(el => el.innerText = '');
+        
+        // Affichage Spinner
+        const btn = document.getElementById('submitBtn');
+        const spinner = document.getElementById('btnSpinner');
+        const btnText = document.getElementById('btnText');
+        
+        btn.disabled = true;
+        spinner.classList.remove('d-none');
+        btnText.innerText = 'Envoi en cours...';
+
+        // Simulation d'envoi AJAX (remplacer par fetch vers ta vue Django)
+        const formData = new FormData(this);
+        
+        fetch("{% url 'statapp:contact' %}", {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('successMessage').classList.remove('d-none');
+                form.reset();
+            } else {
+                // Affichage des erreurs renvoyées par Django
+                for (let field in data.errors) {
+                    const errorDiv = document.getElementById(`error_${field}`);
+                    if (errorDiv) {
+                        errorDiv.innerText = data.errors[field][0];
+                        form.querySelector(`[name="${field}"]`).classList.add('is-invalid');
+                    }
+                }
+            }
+        })
+        .finally(() => {
+            btn.disabled = false;
+            spinner.classList.add('d-none');
+            btnText.innerText = 'Envoyer le message';
+        });
+    });
+});
+</script>
+{% endblock content %}

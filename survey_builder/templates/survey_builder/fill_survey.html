@@ -1,6 +1,29 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block title %}{{ survey.title }} | Enquête{% endblock %}
+
+{% block og_title %}Participez à l'enquête : {{ survey.title }}{% endblock %}
+
+{% block og_description %}Participez à l'enquête "{{ survey.title }}". Votre contribution aide à enrichir la base de données statistiques du portail collaboratif.{% endblock %}
+
+{% block twitter_title %}Enquête : {{ survey.title }}{% endblock %}
+{% block twitter_description %}Accédez au formulaire et soumettez vos données.{% endblock %}
+
+{% block extra_meta %}
+    {# On met ici ce qui n'a PAS de bloc dédié dans la base #}
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta name="keywords" content="enquête, {{ survey.title }}, data portal">
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Questionnaire",
+      "name": "{{ survey.title|escapejs }}",
+      "url": "{{ request.build_absolute_uri }}"
+    }
+    </script>
+{% endblock extra_meta %}
 {% block content %}
 <div class="container py-5" style="max-width: 900px;">
     <div class="sticky-top bg-f4f7f6 pt-2 pb-3" style="z-index: 1020;">

@@ -3,8 +3,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>{% block title %}Portail de données collaboratif | Recherche & Enquêtes{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>{% block title %}Portail de données collaboratif | Recherche & Enquêtes{% endblock %}</title>
     
     <meta name="description" content="{% block meta_description %}Plateforme mutualisée pour la collecte, le traitement et la diffusion de données statistiques au Burkina Faso.{% endblock %}">
     <meta name="keywords" content="{% block keywords %}portail de données, plateforme collaborative, statistiques Burkina, enquêtes terrain{% endblock %}">
@@ -15,12 +16,22 @@
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
     <meta property="og:title" content="{% block og_title %}Portail de données - Plateforme collaborative{% endblock %}">
     <meta property="og:description" content="{% block og_description %}Consultez et téléchargez les données statistiques et rapports d'enquêtes.{% endblock %}">
-    <meta property="og:image" content="{% block og_image %}{% static 'images/portal-preview.jpg' %}{% endblock %}">
     
+    <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/portal-share.jpg' %}{% endblock %}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/png">
+
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{% block twitter_title %}Portail de Données Collaboratif{% endblock %}">
     <meta name="twitter:description" content="{% block twitter_description %}Plateforme de gestion d'enquêtes statistiques.{% endblock %}">
-    <meta name="twitter:image" content="{% block twitter_image %}{% static 'images/portal-preview.jpg' %}{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/portal-share.jpg' %}{% endblock %}">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon/favicon-16x16.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicon/apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% static 'images/favicon/site.webmanifest' %}">
+    <link rel="shortcut icon" href="{% static 'images/favicon/favicon.ico' %}">
 
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'fontawesome-free/css/all.min.css' %}">

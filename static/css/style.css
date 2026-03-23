@@ -40,6 +40,9 @@
     color: var(--shine-blue) !important;
     text-decoration: underline;
 }
+.nav-link-data:hover {
+    color: var(--shine-blue) !important;
+}
 
 .dropdown-item:hover {
     background-color: #f8f9fa;
@@ -53,7 +56,22 @@
     background-color: #28a745;
     border: none;
 }
+/* Tablettes (iPad, etc.) */
+@media (max-width: 992px) {
+    .btn-add-data {
+        font-size: 1rem;
+        width: 50%;
+    }
+}
 
+/* Smartphones (iPhone, Android) */
+@media (max-width: 576px) {
+    .btn-add-data {
+        font-size: 0.9rem;
+        width: 100%; /* Pleine largeur sur petit écran pour faciliter le clic */
+        padding: 15px;
+    }
+}
 /* END NAVBAR PARTY  */
 /* FOOTER PARTY */
 /* Optimisations Footer */

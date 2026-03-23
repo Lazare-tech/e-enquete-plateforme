@@ -2,15 +2,24 @@
 {% load static %}
 {% block title %}Contactez le Support Data | Partenariat & Assistance{% endblock %}
 
-{% block meta_description %}Une question sur nos jeux de données ou besoin d'aide pour une enquête ? Notre équipe technique vous accompagne dans vos projets statistiques.{% endblock %}
 
 {% block keywords %}support technique data, aide portail statistique, accès données brutes, collaboration enquête Burkina{% endblock %}
 
 {% block og_title %}Contactez l'Équipe du Portail de Données | Support Client{% endblock %}
 {% block og_description %}Besoin d'un accès spécifique ou d'une assistance sur nos rapports ? Contactez notre équipe technique via ce formulaire.{% endblock %}
-{% block og_image %}{% static 'images/og-contact-portal.jpg' %}{% endblock %}
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+    
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'images/portal-share.jpg' %}">
+    
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/jpeg">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'images/portal-share.jpg' %}">
 
 {% block extra_meta %}
+       
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",

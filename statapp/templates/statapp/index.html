@@ -8,7 +8,12 @@
 
 {% block og_title %}Catalogue de Données Statistiques - Accès aux Enquêtes{% endblock %}
 {% block og_description %}Recherchez et téléchargez les dernières enquêtes et rapports statistiques de notre équipe en quelques clics.{% endblock %}
-{% block og_image %}{% static 'images/home-catalog-banner.jpg' %}{% endblock %}
+{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/portal-share.jpg' %}{% endblock %}
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/png">
+
+
 
 {% block content %}
 <div class="container py-5">

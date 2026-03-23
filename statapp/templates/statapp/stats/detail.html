@@ -17,6 +17,11 @@
 <meta name="twitter:title" content="Fichier de données : {{ file.title }}">
 <meta name="twitter:description" content="{{ file.description|truncatechars:160 }}">
 
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'images/portal-share.jpg' %}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/png">
+<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'images/portal-share.jpg' %}">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org/",
@@ -130,7 +135,7 @@
             <small class="d-block text-muted mt-2">Email</small>
         </a>
 
-        <a href="https://wa.me/+22674478112?text=Bonjour,je souhaite accéder au fichier:{{ file.title|urlencode }}" 
+        <a href="https://wa.me/{{ whatsapp_number }}?text=Bonjour,je souhaite accéder au fichier:{{ file.title|urlencode }}" 
            target="_blank" 
            class="text-decoration-none transition-hover" 
            title="Contacter sur WhatsApp">

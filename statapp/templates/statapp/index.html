@@ -2,9 +2,9 @@
 {% load static %}
 {% block title %}Catalogue des Données Statistiques | Enquêtes & Rapports{% endblock %}
 
-{% block meta_description %}Explorez notre catalogue de données mutualisées : rapports d'enquêtes terrain, analyses statistiques et jeux de données brutes au Burkina Faso.{% endblock %}
+{% block meta_description %}Explorez notre catalogue de données mutualisées:rapports d'enquêtes terrain, analyses statistiques et jeux de données brutes au Burkina Faso.{% endblock %}
 
-{% block keywords %}catalogue données, statistiques Burkina, rapports enquêtes, data open access, jeux de données brutes{% endblock %}
+{% block keywords %}catalogue données, statistiques Burkina, rapports enquêtes,data open access, jeux de données brutes{% endblock %}
 
 {% block og_title %}Catalogue de Données Statistiques - Accès aux Enquêtes{% endblock %}
 {% block og_description %}Recherchez et téléchargez les dernières enquêtes et rapports statistiques de notre équipe en quelques clics.{% endblock %}
@@ -26,7 +26,7 @@
                 <input type="text" 
                        name="q" 
                        class="form-control border-start-0 ps-0" 
-                       placeholder="Rechercher par mot-clé (ex: Coton, Recensement...)"
+                       placeholder="Rechercher par mot-clé (ex: Coton,Recensement...)"
                        hx-get="{% url 'statapp:search' %}" 
                        hx-target="#fileGrid" 
                        hx-trigger="keyup changed delay:500ms">
@@ -39,5 +39,5 @@
     </div>
 </div>
 
-
+{% include 'statapp/components/newsletter.html' %}
 {% endblock content %}

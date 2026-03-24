@@ -7,13 +7,16 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from statapp.forms import CleanRegisterForm
+from statapp.forms import CleanRegisterForm,NewsLetterForm
 from .models import Category, StatFile,UserFileAccess,FAQ, VariableCategory
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import StatFileForm, StatVariableForm,ContactForm
 from django.http import JsonResponse
 from django.db import transaction
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from .models import Newsletter
 # Create your views here.
 def homepage(request):
     # On récupère les fichiers actifs, triés par date (géré par Meta dans le modèle)
@@ -54,7 +57,31 @@ def contact_view(request):
     # Pour une requête GET classique
     form = ContactForm()
     return render(request, 'statapp/partials/contact.html', {'form': form})
-# def check_category(request):
+####
+from django.http import HttpResponse
+
+def newsletter_subscribe(request):
+    if request.method == 'POST':
+        form = NewsLetterForm(request.POST)
+        if form.is_valid():
+            form.save()
+            # On renvoie un bloc HTML de succès et un script pour vider l'input
+            return HttpResponse('''
+                <div class="alert alert-success py-2 rounded-pill small fw-bold animate__animated animate__fadeIn">
+                    ✅ Merci ! Inscription réussie.
+                </div>
+                <script>document.querySelector('input[name="email"]').value = "";</script>
+            ''')
+        else:
+            # On récupère l'erreur
+            error_msg = "Format d'email invalide."
+            if 'email' in form.errors:
+                error_msg = form.errors['email'][0]
+            
+            # On renvoie juste le texte de l'erreur en rouge
+            return HttpResponse(f'<div class="text-danger small fw-bold mt-2 animate__animated animate__shakeX">⚠️ {error_msg}</div>')
+            
+    return HttpResponse("Méthode non autorisée", status=405)# def check_category(request):
 #     title = request.GET.get('title', '').strip()
 #     if not title:
 #         return HttpResponse("")

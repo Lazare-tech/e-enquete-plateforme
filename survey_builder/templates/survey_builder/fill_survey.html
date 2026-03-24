@@ -3,18 +3,15 @@
 
 {% block title %}{{ survey.title }} | Enquête{% endblock %}
 
+{# On utilise les blocs de la base pour ne pas créer de doublons #}
 {% block og_title %}Participez à l'enquête : {{ survey.title }}{% endblock %}
 
-{% block og_description %}Participez à l'enquête "{{ survey.title }}". Votre contribution aide à enrichir la base de données statistiques du portail collaboratif.{% endblock %}
+{% block og_description %}Participez à l'enquête « {{ survey.title }} ». Votre contribution aide à enrichir la base de données statistiques.{% endblock %}
 
-{% block twitter_title %}Enquête : {{ survey.title }}{% endblock %}
-{% block twitter_description %}Accédez au formulaire et soumettez vos données.{% endblock %}
+{% block keywords %}enquête, {{ survey.title }}, data portal{% endblock %}
 
 {% block extra_meta %}
-    {# On met ici ce qui n'a PAS de bloc dédié dans la base #}
-    <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    <meta name="keywords" content="enquête, {{ survey.title }}, data portal">
-    
+    {# Uniquement le JSON-LD ici #}
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",

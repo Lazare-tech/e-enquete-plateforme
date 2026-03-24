@@ -8,6 +8,7 @@ urlpatterns = [
    path('faq/', statapp.views.faq_view, name='faq'),
    path('contact/', statapp.views.contact_view, name='contact'),
    path('detail/<slug:slug>/', statapp.views.detail_stat, name='detail'),
+   path('newsletter/subscribe/', statapp.views.newsletter_subscribe, name='subscribe_newsletter'),
    path('catalogue/', statapp.views.search_files, name='search'),
    path('telecharger/<int:file_id>/', statapp.views.download_stat_file, name='download'),
    path('ajout/', statapp.views.add_data_view, name='add_data'),

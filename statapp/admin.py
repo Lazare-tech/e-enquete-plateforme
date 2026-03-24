@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, StatFile, UserFileAccess,FAQ,StatVariable,VariableCategory,Document,ContactMessage
+from .models import Category, StatFile, UserFileAccess,FAQ,StatVariable,VariableCategory,Document,ContactMessage,Newsletter
 from django.contrib.auth.models import User
 from django import forms
 from adminsortable2.admin import SortableAdminMixin
@@ -271,3 +271,20 @@ class ContactMessageAdmin(admin.ModelAdmin):
     # Optionnel : Empêcher l'ajout manuel depuis l'admin (les messages viennent du site)
     def has_add_permission(self, request):
         return False
+####
+@admin.register(Newsletter)
+class NewsletterAdmin(admin.ModelAdmin):
+    # Colonnes affichées dans la liste
+    list_display = ('email', 'date_added')
+    
+    # Barre de recherche par email
+    search_fields = ('email',)
+    
+    # Filtre latéral par date
+    list_filter = ('date_added',)
+    
+    # Tri par défaut (le plus récent en haut)
+    ordering = ('-date_added',)
+
+    # Empêcher la modification d'un email (optionnel, pour garder l'intégrité)
+    # readonly_fields = ('email', 'date_added')

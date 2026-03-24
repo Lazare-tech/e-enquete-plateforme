@@ -1,0 +1,51 @@
+<section class="container py-5">
+    <div class="row justify-content-center px-3">
+        <div class="col-lg-8 text-center d-flex flex-column align-items-center">
+            
+            <h4 class="fw-bold mb-3" style="color:#122046;">Restez informé !</h4>
+            <p class="lead mb-4 text-muted small">
+                Ne manquez pas nos jeux de données et analyses approfondies.
+            </p>
+
+            <div class="card  shadow-sm bg-white border-0 w-100" style="max-width:550px">
+                <h5 class="mb-3 fw-bold text-title-blue">Newsletter</h5>
+
+                <form hx-post="{% url 'statapp:subscribe_newsletter' %}" 
+                      hx-target="#newsletter-message" 
+                      hx-swap="innerHTML"
+                      novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row g-2">
+                        <div class="col-12 col-md-8">
+                            <input type="email" name="email" required
+                                   class="form-control form-control-lg rounded-pill px-4 shadow-none" 
+                                   placeholder="Votre adresse email"
+                                   style="font-size: 1rem;">
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <button class="btn btn-primary rounded-pill w-100 fw-bold shadow-sm d-flex align-items-center justify-content-center" 
+                                    type="submit" style="height: 50px;">
+                                <span class="htmx-indicator spinner-border spinner-border-sm me-2"></span>
+                                S'abonner
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="newsletter-message" class="mt-3"></div>
+                    
+                 
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .htmx-indicator { display: none; }
+    .htmx-request .htmx-indicator { display: inline-block; }
+    
+    /* Animation pour le message de retour */
+    #newsletter-message { transition: all 0.3s ease; }
+  
+</style>

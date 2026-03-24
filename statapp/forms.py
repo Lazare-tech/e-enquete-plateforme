@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import StatFile, StatVariable,VariableCategory,ContactMessage
+from .models import StatFile, StatVariable,VariableCategory,ContactMessage,Newsletter
 from django.urls import reverse_lazy
 
 ###############
@@ -65,3 +65,32 @@ class ContactForm(forms.ModelForm):
             'objet': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Objet du message'}),
             'message': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Votre message', 'rows': 4}),
         }
+###############################
+class NewsLetterForm(forms.ModelForm):
+    email = forms.EmailField(
+        label="Votre adresse email",
+        error_messages={
+            'invalid': "Veuillez entrer une adresse email valide (ex: contact@domaine.com).",
+            'required': "L'email est nécessaire pour s'abonner.",
+            'unique': "Cette adresse email est déjà inscrite à notre newsletter."
+        },
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Entrez votre email...',
+            'id': 'newsletter-email'
+        })
+    )
+
+    class Meta:
+        model = Newsletter
+        # On ne demande que l'email, le slug et la date sont gérés automatiquement
+        fields = ['email']
+
+    def clean_email(self):
+        """Vérifie si l'email existe déjà pour éviter les doublons proprement"""
+        email = self.cleaned_data.get('email').lower() # On passe tout en minuscule
+        if Newsletter.objects.filter(email=email).exists():
+            raise forms.ValidationError("Vous êtes déjà inscrit à notre newsletter !")
+        return email
+    
+    

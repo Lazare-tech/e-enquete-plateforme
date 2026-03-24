@@ -81,7 +81,13 @@ def newsletter_subscribe(request):
             # On renvoie juste le texte de l'erreur en rouge
             return HttpResponse(f'<div class="text-danger small fw-bold mt-2 animate__animated animate__shakeX">⚠️ {error_msg}</div>')
             
-    return HttpResponse("Méthode non autorisée", status=405)# def check_category(request):
+    return HttpResponse("Méthode non autorisée", status=405)
+####
+def unsubscribe_newsletter(request, email):
+    # On cherche l'abonné et on le supprime
+    subscriber = get_object_or_404(Newsletter, email=email)
+    subscriber.delete()
+    return render(request, 'statapp/components/unsubscribe_success.html', {'email': email})
 #     title = request.GET.get('title', '').strip()
 #     if not title:
 #         return HttpResponse("")

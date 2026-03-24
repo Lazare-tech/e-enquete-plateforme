@@ -4,7 +4,9 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse
 from .models import StatFile, Newsletter
-
+from django.core.mail import EmailMultiAlternatives
+from django.utils.html import strip_tags
+### Signal pour capturer l'ancien état d'un fichier
 @receiver(pre_save, sender=StatFile)
 def capture_old_status(sender, instance, **kwargs):
     if instance.pk:
@@ -15,44 +17,50 @@ def capture_old_status(sender, instance, **kwargs):
             instance._was_active = False
     else:
         instance._was_active = False
-
 @receiver(post_save, sender=StatFile)
 def notify_subscribers_on_activation(sender, instance, created, **kwargs):
-    # On vérifie si on vient de passer de 'Invisible' à 'Visible'
     was_active_before = getattr(instance, '_was_active', False)
     
     if instance.is_active and not was_active_before:
-        subscribers = list(Newsletter.objects.values_list('email', flat=True))
+        subscribers = Newsletter.objects.all()
         
-        if subscribers:
-            # 1. Génération du lien vers la vue détail
-            # reverse('statapp:detail', kwargs={'slug': instance.slug})
-            relative_url = reverse('statapp:detail', kwargs={'slug': instance.slug})
+        for sub in subscribers:
+            # 1. Préparation des liens
+            domain = getattr(settings, 'SITE_URL', 'https://aeaf-41-138-107-85.ngrok-free.app')
+            detail_url = f"{domain}{reverse('statapp:detail', kwargs={'slug': instance.slug})}"
+            unsub_url = f"{domain}{reverse('statapp:unsubscribe_newsletter', kwargs={'email': sub.email})}"
             
-            # 2. Construction de l'URL absolue
-            domain = getattr(settings, 'SITE_URL', 'https://2034-41-138-107-85.ngrok-free.app')
-            full_url = f"{domain}{relative_url}"
+            subject = f"📊 Nouveau fichier : {instance.title}"
             
-            subject = f"📊 Nouvelle ressource : {instance.title}"
-            
-            message = f"""
-            Bonjour,
-            
-            Un nouveau fichier statistique vient d'être publié sur notre portail.
-            
-            📂 Titre : {instance.title}
-            📝 Description : {instance.description[:200]}...
-            
-            Consultez les détails:
-            {full_url}
-            
-            L'équipe du Portail de Données.
+            # 2. Contenu HTML du mail
+            html_content = f"""
+            <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px;">
+                <h2 style="color: #122046;">Bonjour,</h2>
+                <p>Un nouveau jeu de données vient d'être publié sur notre portail.</p>
+                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 10px; margin: 20px 0;">
+                    <h3 style="margin-top: 0;">{instance.title}</h3>
+                    <p>{instance.description[:150]}...</p>
+                    <a href="{detail_url}" style="display: inline-block; padding: 10px 20px; background-color: #0d6efd; color: white; text-decoration: none; border-radius: 50px; font-weight: bold;">Consulter le fichier</a>
+                </div>
+                
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;">
+                
+                <footer style="font-size: 12px; color: #777; text-align: center;">
+                    <p><strong>StatApp - Portail de Données</strong></p>
+                    <p>Burkina Faso, Bobo-Dioulasso <br> Tel : <a href="tel:+226XXXXXXXX">+226 XX XX XX XX</a></p>
+                    <p>Responsable : M. Traoré</p>
+                    <p style="margin-top: 20px;">
+                        Vous ne souhaitez plus recevoir ces emails ? 
+                        <a href="{unsub_url}" style="color: #dc3545; text-decoration: underline;">Se désabonner de la newsletter</a>
+                    </p>
+                </footer>
+            </div>
             """
             
-            send_mail(
-                subject,
-                message,
-                settings.EMAIL_HOST_USER,
-                subscribers,
-                fail_silently=False,
-            )
+            # 3. Version texte brut (fallback)
+            text_content = strip_tags(html_content)
+            
+            # 4. Envoi de l'e-mail
+            msg = EmailMultiAlternatives(subject, text_content, settings.EMAIL_HOST_USER, [sub.email])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()

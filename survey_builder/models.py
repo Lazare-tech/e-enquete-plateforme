@@ -54,7 +54,7 @@ class Question(models.Model):
     dependency_value = models.CharField(max_length=255, blank=True, null=True, help_text="Valeur de l'option qui débloque cette question")
     
     class Meta:
-        ordering = ['order']
+        ordering = ['order','id']
         
     def __str__(self):
         # Affiche le titre de l'enquête + le début de la question

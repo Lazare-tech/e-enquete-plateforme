@@ -19,14 +19,14 @@
     <div class="mb-3">
         <div class="d-flex justify-content-between">
             {{ form.password.label_tag }}
-            <a href="{% url 'password_reset' %}" class="small text-decoration-none">Mot de passe oublié ?</a>
+            <a href="{% url 'password_reset' %}" class="small text-decoration-none text-color">Mot de passe oublié ?</a>
         </div>
         <input type="password" name="password" class="form-control" required>
     </div>
-    <button type="submit" class="btn btn-primary w-100 py-2 rounded-pill">Se connecter</button>
+    <button type="submit" class="btn btn-primary-bl text-white w-100 py-2 rounded-pill">Se connecter</button>
 </form>
                 
-                <div class="text-center mt-3">
+                <div class="text-center mt-3 text-color">
                     <small>Pas encore de compte ? <a href="{% url 'statapp:register' %}">S'inscrire</a></small>
                 </div>
             </div>

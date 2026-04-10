@@ -6,7 +6,7 @@
 
     <a class="navbar-brand d-flex align-items-center me-3" href="/">
 
-      <img src="{% static 'images/portal-share.jpg' %}" alt="logo" style="width:70px; height:auto;">
+      <img src="{% static 'images/portal_share.png' %}" alt="logo" style="width:63px; height:auto;">
 
     </a>
 
@@ -156,10 +156,10 @@
 
     {% else %}
         <div class="d-flex gap-2">
-            <a href="{% url 'statapp:login' %}" class="btn btn-outline-primary btn-sm px-3 py-2 rounded-pill fw-bold flex-grow-1 flex-lg-grow-0 text-center">
+            <a href="{% url 'statapp:login' %}" class="btn btn-outline-primary-bl btn-sm px-3 py-2 rounded-pill fw-bold flex-grow-1 flex-lg-grow-0 text-center">
                 Se connecter
             </a>
-            <a href="{% url 'statapp:register' %}" class="btn btn-primary btn-sm px-3 rounded-pill shadow-sm flex-grow-1 flex-lg-grow-0 text-center">
+            <a href="{% url 'statapp:register' %}" class="btn btn-primary-bl text-white btn-sm px-3 rounded-pill shadow-sm flex-grow-1 flex-lg-grow-0 text-center">
                 S'inscrire
             </a>
         </div>

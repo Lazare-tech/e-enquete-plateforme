@@ -7,20 +7,20 @@
         <div id="ajax-message-container" class="mb-3" style="display: none;"></div>
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
                 <div class="card-header bg-white border-0 pt-4 px-4 text-center">
-                    <h3 class="fw-bold text-primary mb-0">Ajouter des données</h3>
+                    <h3 class="fw-bold text-color mb-0">Ajouter des données</h3>
                     <p class="text-muted">Choisissez le type de contenu à publier.</p>
                 </div>
                 
                 <div class="card-body p-4">
                     <ul class="nav nav-pills nav-fill mb-4 bg-light p-1 rounded-pill" id="dataTabs" role="tablist">
                         <li class="nav-item">
-                            <button class="nav-link active rounded-pill text-decoration-none" data-bs-toggle="tab" data-bs-target="#fileFormTab">
+                            <button class="nav-link  active rounded-pill  text-decoration-none text-color" data-bs-toggle="tab" data-bs-target="#fileFormTab">
                                 <i class="fas fa-file-export me-2"></i>Fichier d'enquête
                             </button>
                         </li>
-                        <li class="nav-item">
-                            <button class="nav-link rounded-pill text-decoration-none" data-bs-toggle="tab" data-bs-target="#varFormTab">
-                                <i class="fas fa-plus-square me-2"></i>Variable simple
+                        <li class="nav-item ">
+                            <button class="nav-link rounded-pill text-decoration-none text-color" data-bs-toggle="tab" data-bs-target="#varFormTab">
+                                <i class="fas fa-plus-square me-2 "></i>Variable simple
                             </button>
                         </li>
                     </ul>
@@ -31,7 +31,7 @@
                                 {% csrf_token %}
                                 
                                 <div class="mb-4 p-3 bg-light rounded-3 border-start border-primary border-4">
-                                    <label class="form-label fw-bold text-primary small uppercase">Optionnel : Créer une catégorie</label>
+                                    <label class="form-label fw-bold text-color small uppercase">Optionnel : Créer une catégorie</label>
                                     <input type="text" name="new_file_category_title" class="form-control mb-1"
                                            placeholder="Taper ici si la catégorie n'existe pas..."
                                            hx-get="{% url 'statapp:check_category' %}" 
@@ -43,7 +43,7 @@
 
                                 {{ file_form.as_p }}
                                
-                                <button type="submit" name="submit_file" class="btn btn-primary w-100 py-3 mt-2">
+                                <button type="submit" name="submit_file" class="btn btn-primary-bl text-white w-100 py-3 mt-2">
                                     <span class="spinner-border spinner-border-sm d-none" role="status"></span>
                                     <span class="btn-text"><i class="fas fa-cloud-upload-alt me-2"></i>Enregistrer le fichier</span>
                                 </button>
@@ -69,7 +69,7 @@
                                 {% comment %} <button type="submit" name="submit_var" id="btn-submit-var" class="btn btn-success w-100 py-3 mt-2">
                                     <i class="fas fa-check-circle me-2"></i>Enregistrer la variable
                                 </button> {% endcomment %}
-                                <button type="submit" name="submit_var" class="btn btn-success w-100 py-3 mt-3">
+                                <button type="submit" name="submit_var" class="btn btn-primary-bl text-white w-100 py-3 mt-3">
                                     <span class="spinner-border spinner-border-sm d-none" role="status"></span>
                                     <span class="btn-text"><i class="fas fa-check-circle me-2"></i>Enregistrer la variable</span>
                                 </button>

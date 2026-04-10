@@ -40,13 +40,13 @@ def notify_subscribers_on_activation(sender, instance, created, **kwargs):
                 <div style="background-color: #f8f9fa; padding: 15px; border-radius: 10px; margin: 20px 0;">
                     <h3 style="margin-top: 0;">{instance.title}</h3>
                     <p>{instance.description[:150]}...</p>
-                    <a href="{detail_url}" style="display: inline-block; padding: 10px 20px; background-color: #0d6efd; color: white; text-decoration: none; border-radius: 50px; font-weight: bold;">Consulter le fichier</a>
+                    <a href="{detail_url}" style="display: inline-block; padding: 10px 20px; background-color: #1D5DA3;; color: white; text-decoration: none; border-radius: 50px; font-weight: bold;">Consulter le fichier</a>
                 </div>
                 
                 <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;">
                 
                 <footer style="font-size: 12px; color: #777; text-align: center;">
-                    <p><strong>StatApp - Portail de Données</strong></p>
+                    <p><strong>Statisticiens - Portail de Données</strong></p>
                     <p>Burkina Faso, Bobo-Dioulasso <br> Tel : <a href="tel:+226XXXXXXXX">+226 XX XX XX XX</a></p>
                     <p>Responsable : M. Traoré</p>
                     <p style="margin-top: 20px;">

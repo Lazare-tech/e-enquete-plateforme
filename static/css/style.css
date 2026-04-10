@@ -4,10 +4,10 @@
 /* Style spécifique à l'identité visuelle Shine */
 /* Variables d'identité visuelle */
 :root {
-    --shine-blue: #122046;
+    --shine-blue: #1D5DA3;
     --shine-gold: #D4AF37;
     --btn-button-success: #28a745;
-    --btn-button-primary: #003d7a;
+    --btn-button-primary: #1D5DA3;
 }
 /* Vos styles restent identiques */
 .hover-lift { transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); }
@@ -36,13 +36,7 @@
     display: none; 
 }
 
-.nav-link:hover {
-    color: var(--shine-blue) !important;
-    text-decoration: underline;
-}
-.nav-link-data:hover {
-    color: var(--shine-blue) !important;
-}
+
 
 .dropdown-item:hover {
     background-color: #f8f9fa;
@@ -122,3 +116,21 @@ footer {
         transform: scale(1.1);
         opacity: 0.8;
     }
+.btn-primary-bl {
+    background-color: #1D5DA3;;
+}
+.btn-primary-bl:hover {
+    background-color: #1D5DA3;
+    opacity: 0.9;
+}
+.btn-outline-primary-bl{
+    border:1px solid #1D5DA3;
+    color:#1D5DA3
+}
+.btn-outline-primary-bl:hover {
+    background-color: #1D5DA3;
+    color: white;
+}
+.text-color{
+    color:#1D5DA3
+}

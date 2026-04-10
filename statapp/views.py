@@ -88,15 +88,7 @@ def unsubscribe_newsletter(request, email):
     subscriber = get_object_or_404(Newsletter, email=email)
     subscriber.delete()
     return render(request, 'statapp/components/unsubscribe_success.html', {'email': email})
-#     title = request.GET.get('title', '').strip()
-#     if not title:
-#         return HttpResponse("")
-    
-#     exists = Category.objects.filter(title__iexact=title).exists()
-#     if exists:
-#         return HttpResponse('<span class="text-danger small"><i class="fas fa-exclamation-triangle"></i> Cette catégorie existe déjà !</span>')
-#     else:
-#         return HttpResponse('<span class="text-success small"><i class="fas fa-check"></i> Nom disponible (sera soumis à validation)</span>')
+####
 def check_category(request):
     title = (request.GET.get('new_file_category_title') or 
              request.GET.get('new_category_title') or 
@@ -120,26 +112,7 @@ def check_category(request):
         btn_icon = '<i class="fas fa-cloud-upload-alt me-2"></i>'
         btn_class = "btn-primary"
 
-    # if exists:
-    #     content = f'''
-    #         <span class="text-danger small fw-bold animate__animated animate__shakeX">
-    #             <i class="fas fa-exclamation-triangle me-1"></i> Cette catégorie existe déjà !
-    #         </span>
-    #         <button type="submit" name="{submit_name}" id="{target_btn}" hx-swap-oob="true" 
-    #                 disabled class="btn btn-secondary w-100 py-3 mt-2">
-    #             Nom déjà utilisé
-    #         </button>
-    #     '''
-    # else:
-    #     content = f'''
-    #         <span class="text-success small fw-bold">
-    #             <i class="fas fa-check me-1"></i> Nom disponible (en attente de validation)
-    #         </span>
-    #         <button type="submit" name="{submit_name}" id="{target_btn}" hx-swap-oob="true" 
-    #                 class="btn {btn_class} w-100 py-3 mt-2">
-    #             {btn_icon} Enregistrer
-    #         </button>
-    #     '''
+  
     
     return HttpResponse(content)
 ######

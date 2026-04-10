@@ -41,7 +41,7 @@
 
             <div class="card border-0 shadow-lg custom-form-card">
                 <div class="card-body p-4 p-md-5">
-                    <h2 class="text-center mb-4 fw-bold text-primary">Contactez-nous</h2>
+                    <h2 class="text-center mb-4 fw-bold text-color">Contactez-nous</h2>
                     
                     <form id="contactForm" method="POST" novalidate>
                         {% csrf_token %}
@@ -76,7 +76,7 @@
                             <div class="text-danger small mt-1 error-msg" id="error_message"></div>
                         </div>
 
-                        <button type="submit" id="submitBtn" class="btn btn-primary w-100 fw-bold py-3 shadow-sm rounded-pill transition-all">
+                        <button type="submit" id="submitBtn" class="btn btn-primary-bl text-white w-100 fw-bold py-3 shadow-sm rounded-pill transition-all">
                             <span id="btnText">Envoyer le message</span>
                             <span id="btnSpinner" class="spinner-border spinner-border-sm d-none ms-2" role="status"></span>
                         </button>

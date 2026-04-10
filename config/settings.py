@@ -27,38 +27,21 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*','192.168.122.1']
+ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['https://*.ngrok-free.app']
 
 # Ajoute explicitement le support pour les fichiers audio m4a
 mimetypes.add_type("audio/mp4", ".m4a", True)
 mimetypes.add_type("audio/aac", ".aac", True)
-SITE_ID = 1
-# DOMAIN_NAME ='39ad-41-138-107-85.ngrok-free.ap'
-# EN PROD 
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'votre-email@gmail.com'
-# EMAIL_HOST_PASSWORD = 'votre-mot-de-passe-d-application' # Mot de passe d'application Google
-# Application definition
-# EMAIL_BACKEND=config('EMAIL_BACKEND')
-
-# EMAIL_HOST=config('EMAIL_HOST')
-# EMAIL_PORT=config('EMAIL_PORT')
-# EMAIL_USE_TLS=config('EMAIL_USE_TLS')
-# EMAIL_USE_SSL=config('EMAIL_USE_SSL')
-# EMAIL_HOST_USER=config('EMAIL_HOST_USER')
-# EMAIL_HOST_PASSWORD=config('EMAIL_HOST_PASSWORD')
-# DEFAULT_FROM_EMAIL=config('DEFAULT_FROM_EMAIL')
+SITE_ID=1
 # settings.py
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'yelmaniyel@gmail.com'
-EMAIL_HOST_PASSWORD = 'zrrvmueqtxxxcgxf'
-DEFAULT_FROM_EMAIL = 'DataStat <yelmaniyel@gmail.com>'
+EMAIL_BACKEND = config('EMAIL_BACKEND')
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT',cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS',cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 ###
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -172,6 +155,13 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # Les fichiers iront dans le dossier /media de votre projet
+
+# 2. Ajoute cette ligne pour la compression et le cache (Performance)
+# Cela ajoute un hash unique aux fichiers (ex: style.css -> style.a1b2c3.css)
+# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+#a jouter au middleware
+# "whitenoise.middleware.WhiteNoiseMiddleware", 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
